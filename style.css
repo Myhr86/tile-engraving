@@ -37,3 +37,5 @@ canvas { width: 100%; height: auto; display: block; background: #000; }
 body.has-image .views figure { display: block; }
 body.has-image .views .empty { display: none; }
 @media (max-width: 800px) { main { flex-direction: column; } .panel { width: 100%; } }
+.field { display: block; margin: 8px 0; font-size: 12px; }
+.field input { display: block; width: 100%; margin-top: 3px; padding: 7px; font-size: 14px; background: #2c2d35; color: var(--text); border: 1px solid var(--line); border-radius: 4px; }

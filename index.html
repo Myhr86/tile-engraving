@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Flisgravering – bildeforberedelse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Great+Vibes&family=Playfair+Display:wght@700&display=swap">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -31,7 +34,7 @@
 
       <section>
         <h2>3. Utsnitt</h2>
-        <label class="slider"><span>Zoom</span><input type="range" id="zoom" min="1" max="5" step="0.01" value="1"></label>
+        <label class="slider"><span>Zoom</span><input type="range" id="zoom" min="0.5" max="5" step="0.01" value="1"></label>
         <p class="hint">Dra i originalbildet for å flytte utsnittet, og bruk musehjulet for å zoome.</p>
       </section>
 
@@ -49,13 +52,32 @@
       </section>
 
       <section>
-        <h2>5. Finjuster</h2>
+        <h2>5. Navn på flisen</h2>
+        <label><input type="checkbox" id="tEnabled"> Ta med navn</label>
+        <label class="field">Navn <input type="text" id="tName" placeholder="f.eks. Bella eller Fjellro"></label>
+        <div id="textOpts">
+          <label class="field">Undertekst (valgfri) <input type="text" id="tSub" placeholder="f.eks. 2012 – 2026 eller Est. 1987"></label>
+          <div class="row">
+            <label>Plassering
+              <select id="tPos"><option value="top">Over</option><option value="bottom">Under</option></select>
+            </label>
+            <label>Skrift <select id="tFont"></select></label>
+          </div>
+          <label class="slider"><span>Tekststørrelse</span><input type="range" id="tSize" min="0.05" max="0.2" step="0.005"></label>
+          <label class="slider"><span>Mørk sone bak teksten</span><input type="range" id="tShade" min="0" max="1" step="0.01"></label>
+          <label><input type="checkbox" id="tOrn"> Ornament (pyntelinje)</label>
+          <p class="hint">Tips: Zoom litt ut (under 1) eller dra bildet hvis motivet havner bak teksten.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>6. Finjuster</h2>
         <div id="sliders"></div>
         <button id="reset" class="small">Tilbakestill til stilen</button>
       </section>
 
       <section>
-        <h2>6. Eksport til laser</h2>
+        <h2>7. Eksport til laser</h2>
         <div class="row">
           <label>Størrelse (cm) <input type="number" id="size" value="20" min="1" max="100" step="0.1"></label>
           <label>DPI
@@ -87,6 +109,7 @@
 
   <script src="js/presets.js"></script>
   <script src="js/processing.js"></script>
+  <script src="js/text.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

@@ -17,6 +17,8 @@ window.PRESETS = {
       brightness: 0, contrast: 0, gamma: 1.0,
       blackPoint: 8, whitePoint: 250,
     },
+    // Standard tekstoppsett: navnet under hunden, i klassisk serif.
+    text: { position: 'bottom', font: 'playfair', size: 0.11, ornament: true, shade: 0.85 },
   },
   hytte: {
     label: 'Hytte',
@@ -29,5 +31,7 @@ window.PRESETS = {
       brightness: 0, contrast: 0, gamma: 1.0,
       blackPoint: 6, whitePoint: 248,
     },
+    // Standard tekstoppsett: hyttenavnet øverst med romerske versaler og ornament.
+    text: { position: 'top', font: 'cinzel', size: 0.1, ornament: true, shade: 0.9 },
   },
 };

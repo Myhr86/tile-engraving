@@ -27,6 +27,7 @@
     preset: 'hund',
     params: null,
     custom: JSON.parse(localStorage.getItem(STORE) || '{}'),
+    text: { enabled: false, name: '', subtitle: '', position: 'bottom', font: 'playfair', size: 0.11, ornament: true, shade: 0.85 },
   };
 
   function allPresets() {
@@ -90,6 +91,10 @@
     state.preset = key;
     const p = allPresets()[key];
     state.params = { ...p.params };
+    if (p.text) {
+      Object.assign(state.text, p.text);
+      syncText();
+    }
     buildPresetButtons();
     syncControls();
     schedule();
@@ -117,8 +122,9 @@
     const ctx = c.getContext('2d', { willReadFrequently: true });
     const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
     const side = Math.min(w, h) / state.zoom;
-    const sx = Math.min(Math.max(state.cx * w - side / 2, 0), w - side);
-    const sy = Math.min(Math.max(state.cy * h - side / 2, 0), h - side);
+    const fit = (v, lim) => Math.min(Math.max(v, Math.min(0, lim)), Math.max(0, lim));
+    const sx = fit(state.cx * w - side / 2, w - side);
+    const sy = fit(state.cy * h - side / 2, h - side);
     ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(img, sx, sy, side, side, 0, 0, size, size);
     return ctx.getImageData(0, 0, size, size);
@@ -138,6 +144,7 @@
     const src = state.img === state.origImg ? orig : cropTo(PREVIEW);
     const target = allPresets()[state.preset].target;
     const g = Engrave.process(src, PREVIEW, state.params, target, 1);
+    EngraveText.apply(g, PREVIEW, state.text);
     $('result').getContext('2d').putImageData(Engrave.toImageData(g, PREVIEW, { tone: $('warm').checked }), 0, 0);
   }
 
@@ -153,6 +160,7 @@
       const src = cropTo(size);
       const target = allPresets()[state.preset].target;
       let g = Engrave.process(src, size, state.params, target, size / PREVIEW);
+      EngraveText.apply(g, size, state.text);
       if ($('dither').checked) g = Engrave.dither(g, size);
       const c = document.createElement('canvas');
       c.width = c.height = size;
@@ -221,7 +229,8 @@
     const name = prompt('Lagre nåværende innstillinger som ny stil. Navn:');
     if (!name) return;
     const key = 'custom_' + Date.now();
-    state.custom[key] = { label: name, target: allPresets()[state.preset].target, params: { ...state.params } };
+    const { position, font, size, ornament, shade } = state.text;
+    state.custom[key] = { label: name, target: allPresets()[state.preset].target, params: { ...state.params }, text: { position, font, size, ornament, shade } };
     localStorage.setItem(STORE, JSON.stringify(state.custom));
     selectPreset(key);
   }
@@ -238,24 +247,60 @@
       state.cx = drag.cx - ((e.clientX - drag.x) * k) / w;
       state.cy = drag.cy - ((e.clientY - drag.y) * k) / h;
       const hw = side / 2 / w, hh = side / 2 / h;
-      state.cx = Math.min(Math.max(state.cx, hw), 1 - hw);
-      state.cy = Math.min(Math.max(state.cy, hh), 1 - hh);
+      const lim = (v, m) => Math.min(Math.max(v, Math.min(m, 1 - m)), Math.max(m, 1 - m));
+      state.cx = lim(state.cx, hw);
+      state.cy = lim(state.cy, hh);
       schedule();
     });
     cv.addEventListener('pointerup', () => (drag = null));
     cv.addEventListener('wheel', (e) => {
       e.preventDefault();
-      state.zoom = Math.min(5, Math.max(1, state.zoom * (e.deltaY < 0 ? 1.08 : 1 / 1.08)));
+      state.zoom = Math.min(5, Math.max(0.5, state.zoom * (e.deltaY < 0 ? 1.08 : 1 / 1.08)));
       $('zoom').value = state.zoom;
       schedule();
     }, { passive: false });
     $('zoom').addEventListener('input', (e) => { state.zoom = parseFloat(e.target.value); schedule(); });
   }
 
+  // ---------- Tekst / navn ----------
+  function syncText() {
+    const t = state.text;
+    $('tEnabled').checked = t.enabled;
+    $('tName').value = t.name;
+    $('tSub').value = t.subtitle;
+    $('tPos').value = t.position;
+    $('tFont').value = t.font;
+    $('tSize').value = t.size;
+    $('tOrn').checked = t.ornament;
+    $('tShade').value = t.shade;
+    $('textOpts').style.display = t.enabled ? '' : 'none';
+  }
+
+  function setupText() {
+    $('tFont').innerHTML = Object.entries(EngraveText.FONTS).map(([k, f]) => `<option value="${k}">${f.label}</option>`).join('');
+    const bind = (id, key, get) => $(id).addEventListener('input', () => {
+      state.text[key] = get($(id));
+      if (key === 'name' && state.text.name && !state.text.enabled) state.text.enabled = true;
+      syncText();
+      schedule();
+    });
+    bind('tEnabled', 'enabled', (e) => e.checked);
+    bind('tName', 'name', (e) => e.value);
+    bind('tSub', 'subtitle', (e) => e.value);
+    bind('tPos', 'position', (e) => e.value);
+    bind('tFont', 'font', (e) => e.value);
+    bind('tSize', 'size', (e) => parseFloat(e.value));
+    bind('tOrn', 'ornament', (e) => e.checked);
+    bind('tShade', 'shade', (e) => parseFloat(e.value));
+    syncText();
+    EngraveText.loadFonts().then(schedule);
+  }
+
   // ---------- Oppstart ----------
   function init() {
     for (const id of ['orig', 'result']) { $(id).width = $(id).height = PREVIEW; }
     buildSliders();
+    setupText();
     selectPreset('hund');
     setupCrop();
     $('file').addEventListener('change', (e) => loadFile(e.target.files[0]));

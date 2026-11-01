@@ -16,6 +16,16 @@ Alt kjører lokalt i nettleseren, så bildene sendes ikke til noen server.
 6. Finjuster med glidebryterne om nødvendig.
 7. Last ned PNG. Filen får riktig DPI for 20 cm. Huk av for *Inverter* hvis laserprogrammet brenner der bildet er sort, slik LightBurn gjør som standard.
 
+## Navn på flisen
+![Eksempler med navn](docs/eksempel-navn.png)
+
+Skriv navnet på hunden eller hytta i feltet **Navn**. Du kan også legge til en undertekst, for eksempel «2014 – 2026» eller «Est. 1987».
+* **Plassering:** over eller under motivet. Hund har navnet under som standard, og Hytte har det over.
+* **Skrift:** Klassisk (Playfair), Romersk (Cinzel), Håndskrift (Great Vibes) eller Georgia. De tre første lastes fra Google Fonts. Uten nett brukes Georgia.
+* **Ornament:** en pyntelinje med krusedull, som på «Åge 40 år»-flisen.
+* **Mørk sone bak teksten:** Bildet tones ned mot sort bak teksten, slik at bokstavene står rent og hvitt.
+* Zoom under 1 krymper motivet, slik at det blir plass til teksten.
+
 ## Slik fungerer det
 1. **Gråtoner og beskjæring** til et kvadrat.
 2. **Lokal kontrast (CLAHE)** henter fram struktur i pels, treverk og vann, og gir det «graverte» uttrykket.
