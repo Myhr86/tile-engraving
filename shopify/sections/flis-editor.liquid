@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Great+Vibes&family=Playfair+Display:wght@700&display=swap">
 {{ 'flis-editor.css' | asset_url | stylesheet_tag }}
 
-<div class="page-width flis-editor-section" style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
+<div id="lag-flis" class="page-width flis-editor-section" style="scroll-margin-top: 80px; padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
   {%- if section.settings.heading != blank -%}
     <h2 style="text-align:center;">{{ section.settings.heading | escape }}</h2>
   {%- endif -%}
