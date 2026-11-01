@@ -33,6 +33,15 @@ Skriv navnet på hunden eller hytta i feltet **Navn**. Du kan også legge til en
 4. **Skarphet** (uskarp maske), deretter **nivåer** (sortpunkt og hvitpunkt, gamma, kontrast).
 5. **Vignett eller maske**: Bakgrunnen går mykt over i sort, slik at lakken blir stående der.
 
+## Nettbutikk (Shopify)
+En enkel kundeversjon ligger i `shop/`, og de ferdige temafilene i `shopify/`. Se **[SHOPIFY.md](SHOPIFY.md)** for hvordan du installerer den, og hvordan du åpner bestillinger i dette verktøyet.
+
+## Mapper
+* `index.html`, `js/app.js`: graveringsverktøyet ditt (admin)
+* `js/presets.js`, `js/processing.js`, `js/crop.js`, `js/text.js`: felles kjerne
+* `shop/`: kunde-editor for nettbutikken
+* `shopify/`: ferdige filer til Shopify-temaet, bygget med `node tools/build-shopify.mjs`
+
 ## Egne stiler
 * **«+ Ny stil fra vellykket gravering»**: Last opp et bilde som ble bra. Appen måler tonekurven i det og lagrer den som en ny stil, for eksempel «Katt» eller «Portrett».
 * **«Lagre innstillinger som stil»**: Lagrer glidebryterne du har stilt inn.

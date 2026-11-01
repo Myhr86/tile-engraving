@@ -23,6 +23,14 @@
         <p class="hint">Du kan også dra og slippe bildet her eller lime det inn (Ctrl+V).</p>
       </section>
 
+      <details class="order">
+        <summary>Åpne bestilling fra nettbutikken</summary>
+        <p class="hint">Åpne ordren i Shopify. Last ned «_Originalbilde», og kopier teksten i «_Oppskrift».</p>
+        <label class="field">Oppskrift <textarea id="recipe" rows="3" placeholder='{"v":1,"preset":"hund",…}'></textarea></label>
+        <label class="file small">Velg originalbildet…<input type="file" id="orderFile" accept="image/*"></label>
+        <p id="orderStatus" class="hint"></p>
+      </details>
+
       <section>
         <h2>2. Motiv / stil</h2>
         <div id="presets" class="presets"></div>
@@ -114,6 +122,7 @@
 
   <script src="js/presets.js"></script>
   <script src="js/processing.js"></script>
+  <script src="js/crop.js"></script>
   <script src="js/text.js"></script>
   <script src="js/app.js"></script>
 </body>

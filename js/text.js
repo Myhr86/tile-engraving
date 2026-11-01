@@ -64,7 +64,20 @@
     ctx.textAlign = 'center';
     ctx.textBaseline = 'alphabetic';
 
-    const fs = size * t.size;                       // skriftstørrelse navn
+    let fs = size * t.size;                         // skriftstørrelse navn
+    // Krymp skriften automatisk hvis et langt navn ikke får plass i bredden.
+    {
+      const maxW = size * 0.86;
+      const nfs = fs * (font.scale || 1);
+      ctx.font = `${font.weight} ${nfs}px ${font.family}`;
+      ctx.letterSpacing = `${font.spacing * nfs}px`;
+      const wName = name ? ctx.measureText(font.upper ? name.toUpperCase() : name).width : 0;
+      ctx.font = `600 ${fs * 0.36}px ${SUB_FONT}`;
+      ctx.letterSpacing = `${fs * 0.36 * 0.25}px`;
+      const wSub = sub ? ctx.measureText(sub.toUpperCase()).width : 0;
+      const widest = Math.max(wName, wSub);
+      if (widest > maxW) fs *= maxW / widest;
+    }
     const subFs = fs * 0.36;
     const orn = t.ornament ? fs * 0.5 : 0;           // høyde ornament
     const gap = fs * 0.14;

@@ -108,14 +108,48 @@
     img.src = url;
     await img.decode();
     state.img = state.origImg = img;
-    const w = img.naturalWidth, h = img.naturalHeight;
     // Zoom der hele bildet får plass i den kvadratiske ruten (1 = fyller ruten).
-    state.fitZoom = Math.min(w, h) / Math.max(w, h);
+    state.fitZoom = EngraveCrop.fitZoom(img);
     state.minZoom = Math.min(0.5, state.fitZoom * 0.8);
     $('zoom').min = state.minZoom.toFixed(3);
     $('aiStatus').textContent = '';
     document.body.classList.add('has-image');
     setZoom(state.fitZoom, true); // standard: vis hele bildet, ingenting kuttes
+    if (state.pendingRecipe) applyRecipe(state.pendingRecipe);
+  }
+
+  // ---------- Bestilling fra nettbutikken ----------
+  // «Oppskriften» lagres på ordrelinjen av butikk-editoren (shop/editor.js).
+  function applyRecipe(r) {
+    const presets = allPresets();
+    if (r.preset && presets[r.preset]) selectPreset(r.preset);
+    if (r.text) {
+      Object.assign(state.text, r.text);
+      syncText();
+    }
+    if (state.origImg) {
+      state.zoom = r.zoom; state.cx = r.cx; state.cy = r.cy;
+      EngraveCrop.clamp(state, state.origImg);
+      $('zoom').value = state.zoom;
+      state.pendingRecipe = null;
+      $('orderStatus').textContent = '✔ Bestillingen er åpnet. Finjuster om nødvendig, og last ned.';
+    } else {
+      state.pendingRecipe = r;
+      $('orderStatus').textContent = 'Oppskrift lest. Velg nå originalbildet fra ordren.';
+    }
+    schedule();
+  }
+
+  function readRecipe() {
+    const raw = $('recipe').value.trim();
+    if (!raw) return;
+    try {
+      const r = JSON.parse(raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1));
+      if (typeof r.zoom !== 'number') throw new Error('mangler zoom');
+      applyRecipe(r);
+    } catch (e) {
+      $('orderStatus').textContent = '⚠ Klarte ikke å lese oppskriften. Kopier hele teksten fra «_Oppskrift» i ordren.';
+    }
   }
 
   function setZoom(z, center) {
@@ -130,9 +164,7 @@
   function updateCropInfo() {
     const img = state.origImg;
     if (!img) return;
-    const w = img.naturalWidth, h = img.naturalHeight;
-    const side = Math.min(w, h) / state.zoom;
-    const pw = Math.min(1, side / w), ph = Math.min(1, side / h);
+    const { w: pw, h: ph } = EngraveCrop.coverage(state, img);
     const el = $('cropInfo');
     if (pw > 0.995 && ph > 0.995) {
       el.textContent = '✔ Hele bildet er med.';
@@ -143,42 +175,9 @@
     }
   }
 
-  // Tegn kvadratisk utsnitt (beskjæring) i ønsket størrelse.
+  // Tegn kvadratisk utsnitt (felles logikk i js/crop.js).
   function cropTo(size, img = state.img) {
-    const c = document.createElement('canvas');
-    c.width = c.height = size;
-    const ctx = c.getContext('2d', { willReadFrequently: true });
-    const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
-    const side = Math.min(w, h) / state.zoom;
-    const fit = (v, lim) => Math.min(Math.max(v, Math.min(0, lim)), Math.max(0, lim));
-    const sx = fit(state.cx * w - side / 2, w - side);
-    const sy = fit(state.cy * h - side / 2, h - side);
-    // Tegn hele bildet på riktig sted (det som havner utenfor ruten forsvinner,
-    // tomrom blir gjennomsiktig og senere sort).
-    const k = size / side;
-    const dx = -sx * k, dy = -sy * k, dw = w * k, dh = h * k;
-    ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(img, dx, dy, dw, dh);
-    const data = ctx.getImageData(0, 0, size, size);
-    // Myk overgang til sort der bildekanten er synlig inne i ruten.
-    const band = size * 0.04;
-    const edges = [dx > 0.5, dy > 0.5, dx + dw < size - 0.5, dy + dh < size - 0.5];
-    if (edges.some(Boolean)) {
-      const d = data.data;
-      const ss = (t) => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t));
-      for (let y = 0; y < size; y++) {
-        let fy = 1;
-        if (edges[1]) fy *= ss((y - dy) / band);
-        if (edges[3]) fy *= ss((dy + dh - y) / band);
-        for (let x = 0; x < size; x++) {
-          let f = fy;
-          if (edges[0]) f *= ss((x - dx) / band);
-          if (edges[2]) f *= ss((dx + dw - x) / band);
-          if (f < 1) d[(y * size + x) * 4 + 3] *= f;
-        }
-      }
-    }
-    return data;
+    return EngraveCrop.cropTo(img, size, state);
   }
 
   // ---------- Behandling ----------
@@ -288,40 +287,18 @@
   }
 
   // ---------- Beskjæring med mus/finger ----------
-  // Holder utsnittets midtpunkt innenfor lovlig område for gjeldende zoom.
   function clampCenter() {
-    const img = state.origImg;
-    if (!img) return;
-    const w = img.naturalWidth, h = img.naturalHeight;
-    const side = Math.min(w, h) / state.zoom;
-    const hw = side / 2 / w, hh = side / 2 / h;
-    const lim = (v, m) => Math.min(Math.max(v, Math.min(m, 1 - m)), Math.max(m, 1 - m));
-    state.cx = lim(state.cx, hw);
-    state.cy = lim(state.cy, hh);
+    if (state.origImg) EngraveCrop.clamp(state, state.origImg);
   }
 
-  // Flytt utsnittet med et antall skjermpiksler (dx, dy) målt på et lerret med bredde `cssW`.
   function panBy(dx, dy, cssW) {
-    const img = state.origImg, w = img.naturalWidth, h = img.naturalHeight;
-    const side = Math.min(w, h) / state.zoom, k = side / cssW;
-    state.cx -= (dx * k) / w;
-    state.cy -= (dy * k) / h;
-    clampCenter();
+    EngraveCrop.pan(state, state.origImg, dx, dy, cssW);
     schedule();
   }
 
-  // Zoom slik at punktet (fx, fy) – andel 0..1 av ruten – blir stående stille.
   function zoomAt(z, fx = 0.5, fy = 0.5) {
-    const img = state.origImg;
-    if (!img) return;
-    const w = img.naturalWidth, h = img.naturalHeight;
-    const oldSide = Math.min(w, h) / state.zoom;
-    const px = state.cx * w + (fx - 0.5) * oldSide, py = state.cy * h + (fy - 0.5) * oldSide;
-    state.zoom = Math.min(5, Math.max(state.minZoom || 0.5, z));
-    const side = Math.min(w, h) / state.zoom;
-    state.cx = (px - (fx - 0.5) * side) / w;
-    state.cy = (py - (fy - 0.5) * side) / h;
-    clampCenter();
+    if (!state.origImg) return;
+    EngraveCrop.zoomAt(state, state.origImg, z, fx, fy, state.minZoom || 0.5);
     $('zoom').value = state.zoom;
     schedule();
   }
@@ -429,6 +406,8 @@
     selectPreset('hund');
     setupCrop();
     $('file').addEventListener('change', (e) => loadFile(e.target.files[0]));
+    $('orderFile').addEventListener('change', (e) => loadFile(e.target.files[0]));
+    $('recipe').addEventListener('input', readRecipe);
     $('refFile').addEventListener('change', (e) => { addReference(e.target.files[0]); e.target.value = ''; });
     $('saveStyle').onclick = saveCurrentAsStyle;
     $('reset').onclick = () => selectPreset(state.preset);

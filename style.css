@@ -43,3 +43,6 @@ body.has-image .views .empty { display: none; }
 .field input { display: block; width: 100%; margin-top: 3px; padding: 7px; font-size: 14px; background: #2c2d35; color: var(--text); border: 1px solid var(--line); border-radius: 4px; }
 .hint.ok { color: #8fc98f; }
 .hint.warn { color: var(--accent); }
+.order { padding: 10px 0; border-bottom: 1px solid var(--line); }
+.order summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+.field textarea { display: block; width: 100%; margin-top: 3px; padding: 6px; font: 12px monospace; background: #2c2d35; color: var(--text); border: 1px solid var(--line); border-radius: 4px; }

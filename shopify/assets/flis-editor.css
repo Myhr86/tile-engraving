@@ -1,0 +1,30 @@
+/* Flis-editor for Myhr Tre og Design. GENERERT av tools/build-shopify.mjs – ikke rediger her. */
+/* Kunde-editor for nettbutikken. Alt er avgrenset under .flis-editor så temaet ikke påvirkes. */
+.flis-editor { --fe-accent: #1f1f1f; --fe-line: #d8d8d8; --fe-muted: #6b6b6b; max-width: 560px; margin: 0 auto; font: inherit; color: inherit; }
+.flis-editor * { box-sizing: border-box; }
+.flis-editor .fe-tile { position: relative; aspect-ratio: 1; padding: 4%; border-radius: 6px; background: linear-gradient(135deg, #2b2b2b, #0b0b0b); box-shadow: 0 8px 24px rgba(0,0,0,.25), inset 0 0 0 1px #444; }
+.flis-editor .fe-canvas { display: none; width: 100%; height: 100%; background: #000; cursor: grab; touch-action: none; }
+.flis-editor .fe-tile.has-image .fe-canvas { display: block; }
+.flis-editor .fe-tile.has-image .fe-empty { display: none; }
+.flis-editor .fe-empty { position: absolute; inset: 4%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: auto; border: 2px dashed #555; border-radius: 4px; background: #000; color: #eee; cursor: pointer; font: inherit; }
+.flis-editor .fe-empty:hover { border-color: #aaa; }
+.flis-editor .fe-empty-icon { font-size: 44px; line-height: 1; }
+.flis-editor .fe-empty small { color: #aaa; }
+.flis-editor .fe-tools { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.flis-editor .fe-tools[hidden], .flis-editor .fe-hint[hidden] { display: none; }
+.flis-editor .fe-tools input[type=range] { flex: 1; min-width: 100px; }
+.flis-editor .fe-btn { border: 1px solid var(--fe-line); background: #fff; color: #111; border-radius: 6px; padding: 6px 12px; cursor: pointer; font: inherit; }
+.flis-editor .fe-icon { width: 36px; height: 36px; padding: 0; font-size: 20px; }
+.flis-editor .fe-small { font-size: .85em; }
+.flis-editor .fe-hint, .flis-editor .fe-note { color: var(--fe-muted); font-size: .85em; margin: 6px 0; }
+.flis-editor .fe-section { margin-top: 18px; }
+.flis-editor h3 { font-size: 1em; margin: 0 0 8px; }
+.flis-editor .fe-field { display: block; font-size: .85em; margin: 8px 0; color: var(--fe-muted); }
+.flis-editor .fe-field input, .flis-editor .fe-field select { display: block; width: 100%; margin-top: 4px; padding: 10px; font-size: 16px; color: #111; border: 1px solid var(--fe-line); border-radius: 6px; background: #fff; }
+.flis-editor .fe-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+.flis-editor .fe-chip { flex: 1; min-width: 90px; padding: 9px 10px; border: 1px solid var(--fe-line); border-radius: 6px; background: #fff; color: #111; cursor: pointer; font-size: 15px; }
+.flis-editor .fe-chip.active { border-color: var(--fe-accent); box-shadow: inset 0 0 0 1px var(--fe-accent); background: #f4f4f4; }
+.flis-editor .fe-font { font-size: 18px; }
+.flis-editor .fe-add { display: block; width: 100%; margin-top: 12px; padding: 14px; border: 0; border-radius: 6px; background: var(--fe-accent); color: #fff; font: inherit; font-weight: 600; font-size: 1.05em; cursor: pointer; }
+.flis-editor .fe-add:disabled { opacity: .6; cursor: default; }
+.flis-editor .fe-msg { color: #b00020; font-size: .9em; }
