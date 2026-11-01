@@ -22,7 +22,13 @@ Egenskaper som starter med `_`, skjules for kunden, men står på ordren i Shopi
 * Begge produktene har to bilder: motivet (Lissi og Fjelltun) og flisen i ramme på veggen. Rammebildene er laget med `tools/make-mockup.py`.
 * Kolleksjonen **«Personlige fliser – eget bilde»** (`/collections/personlige-fliser`) tar automatisk med alle produkter merket «Eget bilde». Hytteflisen ligger også i kolleksjonen **Hytte**.
 
-Gjenstår: å legge kolleksjonen i menyen, og en testbestilling.
+* Temaet **«Vessel – flis-editor + mobilforside»** (ikke publisert ennå) er en kopi av det publiserte temaet. I tillegg har det:
+  - ny forside (`templates/index.json`, laget med `tools/make-index.py`): bare flisbildet øverst på mobil, og hvit tekst med skygge over bildet,
+  - ny editor-versjon som viser «Laster bildeverktøyet …» og eventuelle feilmeldinger.
+
+Gjenstår: å publisere temaet over, legge kolleksjonen i menyen, og en testbestilling.
+
+> **Viktig etter forhåndsvisning:** Nettleseren husker forhåndsviste temaer. Åpne `https://myhrtreogdesign.com/?preview_theme_id=` (tom verdi) for å se det publiserte temaet igjen.
 
 ## Installasjon (ca. 15 min)
 
