@@ -19,7 +19,10 @@ Egenskaper som starter med `_`, skjules for kunden, men står på ordren i Shopi
 * Produktene **«Hundeflis med eget bilde»** (`/products/hundeflis-med-eget-bilde`) og **«Hytteflis med eget bilde»** (`/products/hytteflis-med-eget-bilde`) er aktive i nettbutikken. De koster 499 kr, har produktbilder (Lissi og Fjelltun), har ikke lagersporing og er koblet til malene.
 * Malene lages med `python3 tools/make-templates.py`.
 
-Gjenstår: å legge dem i en kolleksjon eller meny, og en testbestilling.
+* Begge produktene har to bilder: motivet (Lissi og Fjelltun) og flisen i ramme på veggen. Rammebildene er laget med `tools/make-mockup.py`.
+* Kolleksjonen **«Personlige fliser – eget bilde»** (`/collections/personlige-fliser`) tar automatisk med alle produkter merket «Eget bilde». Hytteflisen ligger også i kolleksjonen **Hytte**.
+
+Gjenstår: å legge kolleksjonen i menyen, og en testbestilling.
 
 ## Installasjon (ca. 15 min)
 
