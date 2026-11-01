@@ -121,6 +121,7 @@
   function setZoom(z, center) {
     state.zoom = Math.min(5, Math.max(state.minZoom || 0.5, z));
     if (center) { state.cx = 0.5; state.cy = 0.5; }
+    clampCenter();
     $('zoom').value = state.zoom;
     schedule();
   }
@@ -287,28 +288,101 @@
   }
 
   // ---------- Beskjæring med mus/finger ----------
+  // Holder utsnittets midtpunkt innenfor lovlig område for gjeldende zoom.
+  function clampCenter() {
+    const img = state.origImg;
+    if (!img) return;
+    const w = img.naturalWidth, h = img.naturalHeight;
+    const side = Math.min(w, h) / state.zoom;
+    const hw = side / 2 / w, hh = side / 2 / h;
+    const lim = (v, m) => Math.min(Math.max(v, Math.min(m, 1 - m)), Math.max(m, 1 - m));
+    state.cx = lim(state.cx, hw);
+    state.cy = lim(state.cy, hh);
+  }
+
+  // Flytt utsnittet med et antall skjermpiksler (dx, dy) målt på et lerret med bredde `cssW`.
+  function panBy(dx, dy, cssW) {
+    const img = state.origImg, w = img.naturalWidth, h = img.naturalHeight;
+    const side = Math.min(w, h) / state.zoom, k = side / cssW;
+    state.cx -= (dx * k) / w;
+    state.cy -= (dy * k) / h;
+    clampCenter();
+    schedule();
+  }
+
+  // Zoom slik at punktet (fx, fy) – andel 0..1 av ruten – blir stående stille.
+  function zoomAt(z, fx = 0.5, fy = 0.5) {
+    const img = state.origImg;
+    if (!img) return;
+    const w = img.naturalWidth, h = img.naturalHeight;
+    const oldSide = Math.min(w, h) / state.zoom;
+    const px = state.cx * w + (fx - 0.5) * oldSide, py = state.cy * h + (fy - 0.5) * oldSide;
+    state.zoom = Math.min(5, Math.max(state.minZoom || 0.5, z));
+    const side = Math.min(w, h) / state.zoom;
+    state.cx = (px - (fx - 0.5) * side) / w;
+    state.cy = (py - (fy - 0.5) * side) / h;
+    clampCenter();
+    $('zoom').value = state.zoom;
+    schedule();
+  }
+
   function setupCrop() {
-    const cv = $('orig');
-    let drag = null;
-    cv.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY, cx: state.cx, cy: state.cy }; cv.setPointerCapture(e.pointerId); });
-    cv.addEventListener('pointermove', (e) => {
-      if (!drag || !state.img) return;
-      const img = state.origImg, w = img.naturalWidth, h = img.naturalHeight;
-      const side = Math.min(w, h) / state.zoom, k = side / cv.getBoundingClientRect().width;
-      state.cx = drag.cx - ((e.clientX - drag.x) * k) / w;
-      state.cy = drag.cy - ((e.clientY - drag.y) * k) / h;
-      const hw = side / 2 / w, hh = side / 2 / h;
-      const lim = (v, m) => Math.min(Math.max(v, Math.min(m, 1 - m)), Math.max(m, 1 - m));
-      state.cx = lim(state.cx, hw);
-      state.cy = lim(state.cy, hh);
-      schedule();
-    });
-    cv.addEventListener('pointerup', () => (drag = null));
-    cv.addEventListener('wheel', (e) => {
+    // Både originalen og flis-forhåndsvisningen kan dras i og zoomes.
+    for (const cv of [$('orig'), $('result')]) {
+      cv.classList.add('draggable');
+      const pointers = new Map();
+      let pinch = null;
+      cv.addEventListener('pointerdown', (e) => {
+        if (!state.img) return;
+        cv.setPointerCapture(e.pointerId);
+        pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        cv.classList.add('dragging');
+        if (pointers.size === 2) {
+          const [a, b] = [...pointers.values()];
+          pinch = { dist: Math.hypot(a.x - b.x, a.y - b.y), zoom: state.zoom };
+        }
+      });
+      cv.addEventListener('pointermove', (e) => {
+        const prev = pointers.get(e.pointerId);
+        if (!prev || !state.img) return;
+        const cur = { x: e.clientX, y: e.clientY };
+        pointers.set(e.pointerId, cur);
+        const rect = cv.getBoundingClientRect();
+        if (pointers.size === 2 && pinch) {
+          const [a, b] = [...pointers.values()];
+          const d = Math.hypot(a.x - b.x, a.y - b.y);
+          const fx = ((a.x + b.x) / 2 - rect.left) / rect.width, fy = ((a.y + b.y) / 2 - rect.top) / rect.height;
+          zoomAt(pinch.zoom * (d / pinch.dist), fx, fy);
+          panBy((cur.x - prev.x) / 2, (cur.y - prev.y) / 2, rect.width);
+        } else if (pointers.size === 1) {
+          panBy(cur.x - prev.x, cur.y - prev.y, rect.width);
+        }
+      });
+      const end = (e) => {
+        pointers.delete(e.pointerId);
+        if (pointers.size < 2) pinch = null;
+        if (!pointers.size) cv.classList.remove('dragging');
+      };
+      cv.addEventListener('pointerup', end);
+      cv.addEventListener('pointercancel', end);
+      cv.addEventListener('wheel', (e) => {
+        if (!state.img) return;
+        e.preventDefault();
+        const rect = cv.getBoundingClientRect();
+        zoomAt(state.zoom * (e.deltaY < 0 ? 1.1 : 1 / 1.1), (e.clientX - rect.left) / rect.width, (e.clientY - rect.top) / rect.height);
+      }, { passive: false });
+      cv.addEventListener('dblclick', () => setZoom(state.fitZoom || 1, true));
+    }
+    // Piltaster flytter utsnittet (Shift = større steg), når man ikke skriver i et felt.
+    window.addEventListener('keydown', (e) => {
+      if (!state.img || /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName) && document.activeElement.type !== 'range') return;
+      const step = e.shiftKey ? 60 : 12;
+      const map = { ArrowLeft: [step, 0], ArrowRight: [-step, 0], ArrowUp: [0, step], ArrowDown: [0, -step] };
+      if (!map[e.key] || document.activeElement.type === 'range') return;
       e.preventDefault();
-      setZoom(state.zoom * (e.deltaY < 0 ? 1.08 : 1 / 1.08));
-    }, { passive: false });
-    $('zoom').addEventListener('input', (e) => setZoom(parseFloat(e.target.value)));
+      panBy(map[e.key][0], map[e.key][1], 700);
+    });
+    $('zoom').addEventListener('input', (e) => zoomAt(parseFloat(e.target.value)));
     $('fitAll').onclick = () => setZoom(state.fitZoom || 1, true);
     $('fillTile').onclick = () => setZoom(1, true);
   }
