@@ -16,10 +16,10 @@ Egenskaper som starter med `_`, skjules for kunden, men står på ordren i Shopi
 * Temaet **«Vessel – med flis-editor (TEST)»** er en kopi av det tidligere publiserte temaet, og er nå publisert. Det har:
   `assets/flis-editor.js`, `assets/flis-editor.css`, `sections/flis-editor.liquid`,
   `templates/product.flis-hund.json` og `templates/product.flis-hytte.json`.
-* Produktene **«Hundeflis med eget bilde»** (`/products/hundeflis-med-eget-bilde`) og **«Hytteflis med eget bilde»** (`/products/hytteflis-med-eget-bilde`) er aktive i nettbutikken. De koster 399 kr, har ikke lagersporing og er koblet til malene.
+* Produktene **«Hundeflis med eget bilde»** (`/products/hundeflis-med-eget-bilde`) og **«Hytteflis med eget bilde»** (`/products/hytteflis-med-eget-bilde`) er aktive i nettbutikken. De koster 499 kr, har produktbilder (Lissi og Fjelltun), har ikke lagersporing og er koblet til malene.
 * Malene lages med `python3 tools/make-templates.py`.
 
-Gjenstår: bilder på produktene, å legge dem i en kolleksjon eller meny, og en testbestilling.
+Gjenstår: å legge dem i en kolleksjon eller meny, og en testbestilling.
 
 ## Installasjon (ca. 15 min)
 
