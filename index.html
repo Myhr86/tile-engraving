@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flisgravering – bildeforberedelse</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Flisgravering</h1>
+    <p>Gjør kundens bilde klart for gravering på sortlakkert flis. Alt skjer i nettleseren din, så bildet lastes ikke opp noe sted.</p>
+  </header>
+
+  <main>
+    <aside class="panel">
+      <section>
+        <h2>1. Bilde</h2>
+        <label class="file">Velg bilde…<input type="file" id="file" accept="image/*"></label>
+        <p class="hint">Du kan også dra og slippe bildet her eller lime det inn (Ctrl+V).</p>
+      </section>
+
+      <section>
+        <h2>2. Motiv / stil</h2>
+        <div id="presets" class="presets"></div>
+        <div class="row">
+          <label class="file small">+ Ny stil fra vellykket gravering<input type="file" id="refFile" accept="image/*"></label>
+          <button id="saveStyle" class="small">Lagre innstillinger som stil</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>3. Utsnitt</h2>
+        <label class="slider"><span>Zoom</span><input type="range" id="zoom" min="1" max="5" step="0.01" value="1"></label>
+        <p class="hint">Dra i originalbildet for å flytte utsnittet, og bruk musehjulet for å zoome.</p>
+      </section>
+
+      <section>
+        <h2>4. Bakgrunn</h2>
+        <div class="row">
+          <label><input type="radio" name="bg" value="none"> Behold</label>
+          <label><input type="radio" name="bg" value="vignette"> Mørk vignett</label>
+        </div>
+        <div class="row">
+          <button id="aiBtn" class="small">Fjern bakgrunn (AI)</button>
+          <button id="aiUndo" class="small">Angre</button>
+        </div>
+        <p id="aiStatus" class="hint"></p>
+      </section>
+
+      <section>
+        <h2>5. Finjuster</h2>
+        <div id="sliders"></div>
+        <button id="reset" class="small">Tilbakestill til stilen</button>
+      </section>
+
+      <section>
+        <h2>6. Eksport til laser</h2>
+        <div class="row">
+          <label>Størrelse (cm) <input type="number" id="size" value="20" min="1" max="100" step="0.1"></label>
+          <label>DPI
+            <select id="dpi">
+              <option>254</option><option selected>300</option><option>318</option><option>400</option><option>508</option>
+            </select>
+          </label>
+        </div>
+        <p class="hint" id="pxInfo"></p>
+        <label><input type="checkbox" id="invert"> Inverter (sort = brenn)</label>
+        <p class="hint">Laseren fjerner sort lakk, så det som blir hvitt på flisen må brennes. De fleste laserprogrammer, for eksempel LightBurn, brenner mest der bildet er mørkt. Huk av her, eller bruk «Invert» i laserprogrammet.</p>
+        <label><input type="checkbox" id="dither"> Dithering (ren sort/hvitt)</label>
+        <button id="exportBtn" class="primary">Last ned PNG</button>
+      </section>
+    </aside>
+
+    <section class="views">
+      <figure>
+        <figcaption>Original (utsnitt)</figcaption>
+        <canvas id="orig" class="crop"></canvas>
+      </figure>
+      <figure>
+        <figcaption>Slik blir flisen <label class="inline"><input type="checkbox" id="warm" checked> varm tone</label></figcaption>
+        <div class="tile"><canvas id="result"></canvas></div>
+      </figure>
+      <p class="empty">Last opp et bilde for å begynne.</p>
+    </section>
+  </main>
+
+  <script src="js/presets.js"></script>
+  <script src="js/processing.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
