@@ -5,6 +5,8 @@ Målet er at nye motiver skal få samme kontrast, lysstyrke og tonefordeling som
 
 Alt kjører lokalt i nettleseren, så bildene sendes ikke til noen server.
 
+![Skjermbilde](docs/skjermbilde.png)
+
 ## Bruk
 1. Åpne `index.html` i nettleseren. Du kan også legge den ut med GitHub Pages: Settings → Pages → Branch.
 2. Last opp bildet. Du kan dra det inn, velge fil eller lime inn med Ctrl+V.
