@@ -13,13 +13,13 @@ Når kunden trykker **Legg i handlekurven**, følger dette med på ordrelinjen:
 Egenskaper som starter med `_`, skjules for kunden, men står på ordren i Shopify-admin.
 
 ## Status i butikken (installert 1. november 2026)
-* Temakopien **«Vessel – med flis-editor (TEST)»** er laget fra det publiserte temaet. Den er ikke publisert. Den har:
+* Temaet **«Vessel – med flis-editor (TEST)»** er en kopi av det tidligere publiserte temaet, og er nå publisert. Det har:
   `assets/flis-editor.js`, `assets/flis-editor.css`, `sections/flis-editor.liquid`,
   `templates/product.flis-hund.json` og `templates/product.flis-hytte.json`.
-* Produktene **«Hundeflis med eget bilde»** og **«Hytteflis med eget bilde»** er laget som utkast til 399 kr, uten lagersporing, og er koblet til malene.
+* Produktene **«Hundeflis med eget bilde»** (`/products/hundeflis-med-eget-bilde`) og **«Hytteflis med eget bilde»** (`/products/hytteflis-med-eget-bilde`) er aktive i nettbutikken. De koster 399 kr, har ikke lagersporing og er koblet til malene.
 * Malene lages med `python3 tools/make-templates.py`.
 
-Gjenstår: bilder på produktene, testbestilling, og å publisere temakopien og produktene.
+Gjenstår: bilder på produktene, å legge dem i en kolleksjon eller meny, og en testbestilling.
 
 ## Installasjon (ca. 15 min)
 
