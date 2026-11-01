@@ -858,7 +858,13 @@ window.PRESETS = {
 
   function mountAll() {
     document.querySelectorAll('[data-flis-editor]:not(.flis-editor)').forEach((el) => {
-      el._flisEditor = new FlisEditor(el);
+      try {
+        el._flisEditor = new FlisEditor(el);
+      } catch (e) {
+        console.error('Flis-editor:', e);
+        el.innerHTML = '<p style="color:#b00020;text-align:center">Bildeverktøyet kunne ikke starte: ' +
+          String(e && e.message || e).replace(/[<>&]/g, '') + '</p>';
+      }
     });
   }
   window.FlisEditor = FlisEditor;
