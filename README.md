@@ -34,6 +34,8 @@ Skriv navnet på hunden eller hytta i feltet **Navn**. Du kan også legge til en
 5. **Vignett eller maske**: Bakgrunnen går mykt over i sort, slik at lakken blir stående der.
 
 ## Nettbutikk (Shopify)
+![Kunde-editor på mobil](docs/butikk-mobil.png)
+
 En enkel kundeversjon ligger i `shop/`, og de ferdige temafilene i `shopify/`. Se **[SHOPIFY.md](SHOPIFY.md)** for hvordan du installerer den, og hvordan du åpner bestillinger i dette verktøyet.
 
 ## Mapper
