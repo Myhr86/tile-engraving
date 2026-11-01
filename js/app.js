@@ -108,11 +108,38 @@
     img.src = url;
     await img.decode();
     state.img = state.origImg = img;
-    state.zoom = 1; state.cx = 0.5; state.cy = 0.5;
-    $('zoom').value = 1;
+    const w = img.naturalWidth, h = img.naturalHeight;
+    // Zoom der hele bildet får plass i den kvadratiske ruten (1 = fyller ruten).
+    state.fitZoom = Math.min(w, h) / Math.max(w, h);
+    state.minZoom = Math.min(0.5, state.fitZoom * 0.8);
+    $('zoom').min = state.minZoom.toFixed(3);
     $('aiStatus').textContent = '';
     document.body.classList.add('has-image');
+    setZoom(state.fitZoom, true); // standard: vis hele bildet, ingenting kuttes
+  }
+
+  function setZoom(z, center) {
+    state.zoom = Math.min(5, Math.max(state.minZoom || 0.5, z));
+    if (center) { state.cx = 0.5; state.cy = 0.5; }
+    $('zoom').value = state.zoom;
     schedule();
+  }
+
+  // Forteller om noe av bildet blir kuttet bort med valgt utsnitt.
+  function updateCropInfo() {
+    const img = state.origImg;
+    if (!img) return;
+    const w = img.naturalWidth, h = img.naturalHeight;
+    const side = Math.min(w, h) / state.zoom;
+    const pw = Math.min(1, side / w), ph = Math.min(1, side / h);
+    const el = $('cropInfo');
+    if (pw > 0.995 && ph > 0.995) {
+      el.textContent = '✔ Hele bildet er med.';
+      el.className = 'hint ok';
+    } else {
+      el.textContent = `⚠ Kantene kuttes: ${Math.round(pw * 100)} % av bredden og ${Math.round(ph * 100)} % av høyden er med.`;
+      el.className = 'hint warn';
+    }
   }
 
   // Tegn kvadratisk utsnitt (beskjæring) i ønsket størrelse.
@@ -125,9 +152,32 @@
     const fit = (v, lim) => Math.min(Math.max(v, Math.min(0, lim)), Math.max(0, lim));
     const sx = fit(state.cx * w - side / 2, w - side);
     const sy = fit(state.cy * h - side / 2, h - side);
+    // Tegn hele bildet på riktig sted (det som havner utenfor ruten forsvinner,
+    // tomrom blir gjennomsiktig og senere sort).
+    const k = size / side;
+    const dx = -sx * k, dy = -sy * k, dw = w * k, dh = h * k;
     ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(img, sx, sy, side, side, 0, 0, size, size);
-    return ctx.getImageData(0, 0, size, size);
+    ctx.drawImage(img, dx, dy, dw, dh);
+    const data = ctx.getImageData(0, 0, size, size);
+    // Myk overgang til sort der bildekanten er synlig inne i ruten.
+    const band = size * 0.04;
+    const edges = [dx > 0.5, dy > 0.5, dx + dw < size - 0.5, dy + dh < size - 0.5];
+    if (edges.some(Boolean)) {
+      const d = data.data;
+      const ss = (t) => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t));
+      for (let y = 0; y < size; y++) {
+        let fy = 1;
+        if (edges[1]) fy *= ss((y - dy) / band);
+        if (edges[3]) fy *= ss((dy + dh - y) / band);
+        for (let x = 0; x < size; x++) {
+          let f = fy;
+          if (edges[0]) f *= ss((x - dx) / band);
+          if (edges[2]) f *= ss((dx + dw - x) / band);
+          if (f < 1) d[(y * size + x) * 4 + 3] *= f;
+        }
+      }
+    }
+    return data;
   }
 
   // ---------- Behandling ----------
@@ -139,6 +189,7 @@
   }
 
   function render() {
+    updateCropInfo();
     const orig = cropTo(PREVIEW, state.origImg);
     $('orig').getContext('2d').putImageData(orig, 0, 0);
     const src = state.img === state.origImg ? orig : cropTo(PREVIEW);
@@ -255,11 +306,11 @@
     cv.addEventListener('pointerup', () => (drag = null));
     cv.addEventListener('wheel', (e) => {
       e.preventDefault();
-      state.zoom = Math.min(5, Math.max(0.5, state.zoom * (e.deltaY < 0 ? 1.08 : 1 / 1.08)));
-      $('zoom').value = state.zoom;
-      schedule();
+      setZoom(state.zoom * (e.deltaY < 0 ? 1.08 : 1 / 1.08));
     }, { passive: false });
-    $('zoom').addEventListener('input', (e) => { state.zoom = parseFloat(e.target.value); schedule(); });
+    $('zoom').addEventListener('input', (e) => setZoom(parseFloat(e.target.value)));
+    $('fitAll').onclick = () => setZoom(state.fitZoom || 1, true);
+    $('fillTile').onclick = () => setZoom(1, true);
   }
 
   // ---------- Tekst / navn ----------

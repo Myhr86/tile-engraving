@@ -11,7 +11,7 @@ Alt kjører lokalt i nettleseren, så bildene sendes ikke til noen server.
 1. Åpne `index.html` i nettleseren. Du kan også legge den ut med GitHub Pages: Settings → Pages → Branch.
 2. Last opp bildet. Du kan dra det inn, velge fil eller lime inn med Ctrl+V.
 3. Velg stil: **Hund** eller **Hytte**.
-4. Juster utsnittet: dra i bildet og zoom med musehjulet.
+4. Juster utsnittet. Som standard er hele bildet med, også brede bilder som biler og panorama. Da blir det sort over og under, med myk overgang. Trykk **Fyll hele ruten** hvis du heller vil beskjære. Dra i bildet og zoom med musehjulet. Under zoomen står det om noe blir kuttet bort.
 5. Velg bakgrunn: *Mørk vignett*, eller *Fjern bakgrunn (AI)*, som krever internett.
 6. Finjuster med glidebryterne om nødvendig.
 7. Last ned PNG. Filen får riktig DPI for 20 cm. Huk av for *Inverter* hvis laserprogrammet brenner der bildet er sort, slik LightBurn gjør som standard.

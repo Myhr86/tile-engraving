@@ -35,7 +35,12 @@
       <section>
         <h2>3. Utsnitt</h2>
         <label class="slider"><span>Zoom</span><input type="range" id="zoom" min="0.5" max="5" step="0.01" value="1"></label>
-        <p class="hint">Dra i originalbildet for å flytte utsnittet, og bruk musehjulet for å zoome.</p>
+        <div class="row">
+          <button id="fitAll" class="small">Vis hele bildet</button>
+          <button id="fillTile" class="small">Fyll hele ruten</button>
+        </div>
+        <p id="cropInfo" class="hint"></p>
+        <p class="hint">Dra i originalbildet for å flytte utsnittet, og bruk musehjulet for å zoome. Det du ser i ruten, er nøyaktig det som blir lagret.</p>
       </section>
 
       <section>
