@@ -87,6 +87,9 @@ for key, heading, intro, link in [
     ("hytte", "Lag flisen med din hytte",
      "<p>Last opp et bilde av hytta, plasser det i ruten og legg gjerne til hyttenavnet. Vi graverer det på en 20 × 20 cm keramisk flis.</p>",
      "Last opp bilde av hytta di ↓"),
+    ("familie", "Lag flisen med familien din",
+     "<p>Last opp et familiebilde eller portrett, plasser det i ruten og legg gjerne til et navn. Bildet kan dekke hele flisen, eller få en myk mørk kant. Vi graverer det på en 20 × 20 cm keramisk flis.</p>",
+     "Last opp familiebildet ditt ↓"),
 ]:
     with open(f"shopify/templates/product.flis-{key}.json", "w") as f:
         json.dump(template(key, heading, intro, link), f, ensure_ascii=False, indent=2)

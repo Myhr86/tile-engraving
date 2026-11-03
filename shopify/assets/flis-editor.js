@@ -7,6 +7,10 @@
 // av gråtonene. De er målt fra midtpartiet av to graveringer som ble ekstra bra:
 //   - Hund : puddel-portrettet (mye mellomtoner, lyse krøller, sort bakgrunn)
 //   - Hytte: fiskeren ved elva (dype sorte, lyse høylys, mye lokal kontrast)
+//   - Familie / portrett: samme kurve og innstillinger som Hytte (testet på familiebilde)
+//
+// `edge` er standard kant i nettbutikk-editoren: 'soft' = myk mørk kant (vignett),
+// 'full' = bildet dekker hele flisen. `ui` er tekstene kunden ser i editoren.
 // Bildet til kunden "tvinges" mot denne fordelingen med histogram-matching.
 window.PRESETS = {
   hund: {
@@ -22,6 +26,8 @@ window.PRESETS = {
     },
     // Standard tekstoppsett: navnet under hunden, i klassisk serif.
     text: { position: 'bottom', font: 'playfair', size: 0.11, ornament: true, shade: 0.85 },
+    edge: 'soft',
+    ui: { upload: 'Last opp bilde av hunden', nameHeading: 'Navn på hunden (valgfritt)', name: 'f.eks. Bella', sub: 'f.eks. 2014 – 2026' },
   },
   hytte: {
     label: 'Hytte',
@@ -36,7 +42,32 @@ window.PRESETS = {
     },
     // Standard tekstoppsett: hyttenavnet øverst med romerske versaler og ornament.
     text: { position: 'top', font: 'cinzel', size: 0.1, ornament: true, shade: 0.9 },
+    edge: 'soft',
+    ui: { upload: 'Last opp bilde av hytta', nameHeading: 'Navn på hytta (valgfritt)', name: 'f.eks. Fjellro', sub: 'f.eks. Est. 1987' },
   },
+  familie: {
+    label: 'Familie / portrett',
+    target: [0, 0, 1, 2, 6, 9, 16, 24, 36, 49, 64, 82, 102, 127, 154, 187, 255],
+    params: {
+      bgMode: 'vignette', vignetteSize: 1.25, vignetteFeather: 0.5,
+      clahe: 0.7, claheClip: 3.0,
+      match: 0.8,
+      sharpen: 1.1, sharpenRadius: 1.0,
+      brightness: 0, contrast: 0, gamma: 1.0,
+      blackPoint: 6, whitePoint: 248,
+    },
+    // Standard: bildet over hele flisen, og navnet under i håndskrift.
+    text: { position: 'bottom', font: 'script', size: 0.1, ornament: true, shade: 0.9 },
+    edge: 'full',
+    ui: { upload: 'Last opp familiebilde eller portrett', nameHeading: 'Navn eller tekst (valgfritt)', name: 'f.eks. Familien Myhr', sub: 'f.eks. Sommeren 2026' },
+  },
+};
+
+// Kant: 'full' betyr ingen vignett, bildet dekker hele flisen.
+window.presetParams = function (preset, edge) {
+  const p = { ...preset.params };
+  if ((edge || preset.edge) === 'full') p.bgMode = 'none';
+  return p;
 };
 
 /* ---- js/processing.js ---- */
@@ -589,6 +620,8 @@ window.PRESETS = {
       this.file = null;
       this.view = { zoom: 1, cx: 0.5, cy: 0.5 };
       this.minZoom = 0.5;
+      this.edge = this.preset.edge || 'soft';
+      this.ui = this.preset.ui || window.PRESETS.hund.ui;
       this.text = {
         enabled: false, name: '', subtitle: '',
         position: 'bottom', font: 'playfair', size: 0.11, ornament: true, shade: 0.85,
@@ -603,13 +636,13 @@ window.PRESETS = {
       const r = this.root;
       r.classList.add('flis-editor');
       r.innerHTML = '';
-      const isHytte = this.presetKey === 'hytte';
+      const ui = this.ui;
 
       this.fileInput = h('input', { type: 'file', accept: 'image/*', hidden: true, onchange: (e) => this.load(e.target.files[0]) });
       this.canvas = h('canvas', { width: PREVIEW, height: PREVIEW, class: 'fe-canvas', 'aria-label': 'Forhåndsvisning av flisen' });
       this.empty = h('button', { type: 'button', class: 'fe-empty', onclick: () => this.fileInput.click() },
         h('span', { class: 'fe-empty-icon' }, '+'),
-        h('strong', {}, isHytte ? 'Last opp bilde av hytta' : 'Last opp bilde av hunden'),
+        h('strong', {}, ui.upload),
         h('small', {}, 'Velg et skarpt bilde med godt lys'));
       this.tile = h('div', { class: 'fe-tile' }, this.canvas, this.empty);
 
@@ -623,10 +656,15 @@ window.PRESETS = {
         h('button', { type: 'button', class: 'fe-btn fe-small', onclick: () => this.fileInput.click() }, 'Bytt bilde'));
       this.hint = h('p', { class: 'fe-hint', hidden: true }, 'Dra i bildet for å flytte det. Klyp eller bruk + og − for å zoome.');
 
+      // Kant: myk mørk kant eller bildet over hele flisen
+      this.edgeButtons = [['full', 'Bildet over hele flisen'], ['soft', 'Myk mørk kant']].map(([v, label]) =>
+        h('button', { type: 'button', class: 'fe-chip', 'data-v': v, onclick: () => this.setEdge(v) }, label));
+      this.edgeRow = h('div', { class: 'fe-row', hidden: true }, this.edgeButtons);
+
       // Tekst
-      this.nameInput = h('input', { type: 'text', maxlength: 30, placeholder: isHytte ? 'f.eks. Fjellro' : 'f.eks. Bella',
+      this.nameInput = h('input', { type: 'text', maxlength: 30, placeholder: ui.name,
         oninput: (e) => this.setText({ name: e.target.value }) });
-      this.subInput = h('input', { type: 'text', maxlength: 40, placeholder: isHytte ? 'f.eks. Est. 1987' : 'f.eks. 2014 – 2026',
+      this.subInput = h('input', { type: 'text', maxlength: 40, placeholder: ui.sub,
         oninput: (e) => this.setText({ subtitle: e.target.value }) });
       this.posButtons = ['top', 'bottom'].map((pos) => h('button', { type: 'button', class: 'fe-chip', 'data-v': pos,
         onclick: () => this.setText({ position: pos }) }, pos === 'top' ? 'Over bildet' : 'Under bildet'));
@@ -649,9 +687,9 @@ window.PRESETS = {
 
       r.append(...[
         this.fileInput,
-        this.tile, this.tools, this.hint,
+        this.tile, this.tools, this.hint, this.edgeRow,
         h('div', { class: 'fe-section' },
-          h('h3', {}, isHytte ? 'Navn på hytta (valgfritt)' : 'Navn på hunden (valgfritt)'),
+          h('h3', {}, ui.nameHeading),
           h('label', { class: 'fe-field' }, 'Navn', this.nameInput),
           h('label', { class: 'fe-field' }, 'Undertekst (valgfri)', this.subInput),
           h('div', { class: 'fe-row' }, this.posButtons),
@@ -662,6 +700,7 @@ window.PRESETS = {
       ].filter(Boolean));
 
       this.setupGestures();
+      this.syncEdge();
       this.syncText();
       this.updateButton();
     }
@@ -680,22 +719,33 @@ window.PRESETS = {
       this.file = file;
       const fz = EngraveCrop.fitZoom(img);
       this.minZoom = Math.min(0.5, fz * 0.8);
-      this.zoomRange.min = this.minZoom.toFixed(3);
       this.fitZoomValue = fz;
       this.tile.classList.add('has-image');
       this.tools.hidden = false;
       this.hint.hidden = false;
-      // Stående/kvadratiske bilder fyller ruten, brede bilder vises i sin helhet.
-      this.view = { zoom: fz < 0.8 ? fz : 1, cx: 0.5, cy: 0.5 };
+      this.edgeRow.hidden = false;
+      // «Hele flisen» fyller alltid ruten. Ellers fyller stående/kvadratiske bilder
+      // ruten, mens brede bilder vises i sin helhet.
+      this.view = { zoom: this.edge === 'full' || fz >= 0.8 ? 1 : fz, cx: 0.5, cy: 0.5 };
+      this.zoomRange.min = this.zoomMin.toFixed(3);
       this.afterView();
       this.updateButton();
     }
 
-    fit() { if (!this.img) return; this.view = { zoom: this.fitZoomValue, cx: 0.5, cy: 0.5 }; this.afterView(); }
+    fit() {
+      if (!this.img) return;
+      // «Vis hele» gir sorte felt på brede bilder, så da passer myk kant best.
+      if (this.edge === 'full' && this.fitZoomValue < 1) { this.edge = 'soft'; this.syncEdge(); }
+      this.view = { zoom: this.fitZoomValue, cx: 0.5, cy: 0.5 };
+      this.afterView();
+    }
+
+    // Med «hele flisen» kan man ikke zoome ut forbi kanten (da kommer sorte felt).
+    get zoomMin() { return this.edge === 'full' ? 1 : this.minZoom; }
 
     zoomTo(z, fx, fy) {
       if (!this.img) return;
-      EngraveCrop.zoomAt(this.view, this.img, z, fx, fy, this.minZoom, 4);
+      EngraveCrop.zoomAt(this.view, this.img, z, fx, fy, this.zoomMin, 4);
       this.afterView();
     }
 
@@ -727,7 +777,7 @@ window.PRESETS = {
           const [a, b] = [...pointers.values()];
           const d = Math.hypot(a.x - b.x, a.y - b.y);
           EngraveCrop.zoomAt(this.view, this.img, pinch.zoom * (d / pinch.dist),
-            ((a.x + b.x) / 2 - rect.left) / rect.width, ((a.y + b.y) / 2 - rect.top) / rect.height, this.minZoom, 4);
+            ((a.x + b.x) / 2 - rect.left) / rect.width, ((a.y + b.y) / 2 - rect.top) / rect.height, this.zoomMin, 4);
           EngraveCrop.pan(this.view, this.img, (cur.x - prev.x) / 2, (cur.y - prev.y) / 2, rect.width);
         } else if (pointers.size === 1) {
           EngraveCrop.pan(this.view, this.img, cur.x - prev.x, cur.y - prev.y, rect.width);
@@ -746,6 +796,20 @@ window.PRESETS = {
       // Dra og slipp en fil på ruten
       this.tile.addEventListener('dragover', (e) => e.preventDefault());
       this.tile.addEventListener('drop', (e) => { e.preventDefault(); this.load(e.dataTransfer.files[0]); });
+    }
+
+    // ---------- Kant ----------
+    setEdge(v) {
+      this.edge = v;
+      // Hele flisen: sørg for at bildet dekker hele ruten (ingen sorte felt).
+      if (v === 'full' && this.img && this.view.zoom < 1) this.view.zoom = 1;
+      this.zoomRange.min = this.zoomMin.toFixed(3);
+      this.syncEdge();
+      if (this.img) this.afterView();
+    }
+
+    syncEdge() {
+      for (const b of this.edgeButtons) b.classList.toggle('active', b.dataset.v === this.edge);
     }
 
     // ---------- Tekst ----------
@@ -770,7 +834,7 @@ window.PRESETS = {
 
     renderGray(size) {
       const src = EngraveCrop.cropTo(this.img, size, this.view);
-      const g = Engrave.process(src, size, this.preset.params, this.preset.target, size / 700);
+      const g = Engrave.process(src, size, window.presetParams(this.preset, this.edge), this.preset.target, size / 700);
       EngraveText.apply(g, size, this.text);
       return g;
     }
@@ -792,7 +856,7 @@ window.PRESETS = {
     recipe() {
       const { enabled, name, subtitle, position, font } = this.text;
       const round = (x) => Math.round(x * 10000) / 10000;
-      return { v: 1, preset: this.presetKey, zoom: round(this.view.zoom), cx: round(this.view.cx), cy: round(this.view.cy),
+      return { v: 1, preset: this.presetKey, edge: this.edge, zoom: round(this.view.zoom), cx: round(this.view.cx), cy: round(this.view.cy),
         text: { enabled, name: name.trim(), subtitle: subtitle.trim(), position, font } };
     }
 
@@ -829,6 +893,7 @@ window.PRESETS = {
         fd.append('id', this.variantId);
         fd.append('quantity', 1);
         fd.append('properties[Motiv]', this.preset.label);
+        fd.append('properties[Kant]', this.edge === 'full' ? 'Bildet over hele flisen' : 'Myk mørk kant');
         if (r.text.name) fd.append('properties[Navn]', r.text.name);
         if (r.text.subtitle) fd.append('properties[Undertekst]', r.text.subtitle);
         if (r.text.enabled) {

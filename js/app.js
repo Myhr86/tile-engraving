@@ -123,6 +123,11 @@
   function applyRecipe(r) {
     const presets = allPresets();
     if (r.preset && presets[r.preset]) selectPreset(r.preset);
+    // Kant fra nettbutikken: 'full' = bildet over hele flisen (ingen vignett)
+    if (r.edge) {
+      state.params = window.presetParams(allPresets()[state.preset], r.edge);
+      syncControls();
+    }
     if (r.text) {
       Object.assign(state.text, r.text);
       syncText();
