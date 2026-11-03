@@ -26,7 +26,14 @@ Egenskaper som starter med `_`, skjules for kunden, men står på ordren i Shopi
   - ny forside (`templates/index.json`, laget med `tools/make-index.py`): bare flisbildet øverst på mobil, og hvit tekst med skygge over bildet,
   - ny editor-versjon som viser «Laster bildeverktøyet …» og eventuelle feilmeldinger.
 
-Gjenstår: å publisere temaet over, legge kolleksjonen i menyen, og en testbestilling.
+* Temaet «Vessel – flis-editor + mobilforside» ble publisert 1.–3. november.
+* Temaet **«Vessel – flis-editor + familie»** (ikke publisert ennå, 3. november) er en kopi av det, og har i tillegg:
+  - stilen **Familie / portrett** (samme innstillinger som Hytte, bildet over hele flisen som standard),
+  - valget «Bildet over hele flisen» eller «Myk mørk kant» i editoren for alle motiver,
+  - malen `templates/product.flis-familie.json`.
+* Produktet **«Familieflis med eget bilde»** (`/products/familieflis-med-eget-bilde`) er laget som **utkast**, til 499 kr, uten bilder, og er koblet til malen `flis-familie`. Det er merket «Eget bilde», så det havner automatisk i kolleksjonen «Personlige fliser» når det aktiveres.
+
+Gjenstår: å publisere temaet «flis-editor + familie», legge inn produktbilder og aktivere familieflisen, legge kolleksjonen i menyen, og en testbestilling.
 
 > **Viktig etter forhåndsvisning:** Nettleseren husker forhåndsviste temaer. Åpne `https://myhrtreogdesign.com/?preview_theme_id=` (tom verdi) for å se det publiserte temaet igjen.
 
