@@ -61,12 +61,14 @@ S = fine*(1-w) + coarse*w
 
 def render(design_path, out_path, seed):
     d = Image.open(design_path).convert('L')
-    N = 1100
-    d = np.asarray(d.resize((N, N), Image.LANCZOS)).astype(np.float32)/255
+    N = 1100      # oppløsning flisa samples i
+    NL = 2362     # laserens oppløsning: 20 cm ved 300 DPI (prikkene lages her)
+    d = np.asarray(d.resize((NL, NL), Image.LANCZOS)).astype(np.float32)/255
     rng = np.random.default_rng(seed)
     dots = (d**1.15 > rng.random(d.shape)).astype(np.float32)        # stokastisk stipple som laseren
     dots = np.maximum(dots, (d > 0.93).astype(np.float32))           # helt hvite flater (tekst) blir hele
-    dimg = Image.fromarray((dots*255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(0.55))
+    # Prikker i laserens oppløsning, skalert ned til fotoets: fine detaljer i ansikter beholdes
+    dimg = Image.fromarray((dots*255).astype(np.uint8)).resize((N, N), Image.BOX).filter(ImageFilter.GaussianBlur(0.4))
     D = np.asarray(dimg).astype(np.float32)/255
     # sample med bilineær interpolasjon
     uu = np.clip(U*(N-1), 0, N-1); vv = np.clip(V*(N-1), 0, N-1)

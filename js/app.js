@@ -90,7 +90,7 @@
   function selectPreset(key) {
     state.preset = key;
     const p = allPresets()[key];
-    state.params = { ...p.params };
+    state.params = window.presetParams ? window.presetParams(p) : { ...p.params };  // Familie: hele flisen (ingen vignett)
     if (p.text) {
       Object.assign(state.text, p.text);
       syncText();

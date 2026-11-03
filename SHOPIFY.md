@@ -27,13 +27,13 @@ Egenskaper som starter med `_`, skjules for kunden, men står på ordren i Shopi
   - ny editor-versjon som viser «Laster bildeverktøyet …» og eventuelle feilmeldinger.
 
 * Temaet «Vessel – flis-editor + mobilforside» ble publisert 1.–3. november.
-* Temaet **«Vessel – flis-editor + familie»** (ikke publisert ennå, 3. november) er en kopi av det, og har i tillegg:
+* Temaet **«Vessel – flis-editor + familie»** (publisert 3. november) er en kopi av det, og har i tillegg:
   - stilen **Familie / portrett** (samme innstillinger som Hytte, bildet over hele flisen som standard),
   - valget «Bildet over hele flisen» eller «Myk mørk kant» i editoren for alle motiver,
   - malen `templates/product.flis-familie.json`.
-* Produktet **«Familieflis med eget bilde»** (`/products/familieflis-med-eget-bilde`) er laget som **utkast**, til 499 kr, uten bilder, og er koblet til malen `flis-familie`. Det er merket «Eget bilde», så det havner automatisk i kolleksjonen «Personlige fliser» når det aktiveres.
+* Produktet **«Familieflis med eget bilde»** (`/products/familieflis-med-eget-bilde`) er aktivt i nettbutikken, til 499 kr, og koblet til malen `flis-familie`. Det har to bilder: Skjærseth-flisen i ramme på veggen, og selve motivet. Det ligger i kolleksjonen «Personlige fliser».
 
-Gjenstår: å publisere temaet «flis-editor + familie», legge inn produktbilder og aktivere familieflisen, legge kolleksjonen i menyen, og en testbestilling.
+Gjenstår: å legge kolleksjonen i menyen, og en testbestilling.
 
 > **Viktig etter forhåndsvisning:** Nettleseren husker forhåndsviste temaer. Åpne `https://myhrtreogdesign.com/?preview_theme_id=` (tom verdi) for å se det publiserte temaet igjen.
 
