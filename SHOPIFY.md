@@ -40,10 +40,15 @@ Egenskaper som starter med `_`, skjules for kunden, men står på ordren i Shopi
 * Temaet **«Vessel – tekst-editor fiks skrifter»** (ikke publisert ennå) er en kopi av «flis + tekst-editor», med ny `tekst-editor.js` der skriftene og produktbildet er bakt inn. Den første versjonen fikk ikke lastet skriftfilene i butikken.
 
 ### Tekstbestillinger (vinåpner)
-På ordren står *Linje 1*, *Linje 2*, *Skrift*, *Forhåndsvisning*, *_Gravering* (PNG ved 600 DPI, klar for LightBurn) og *_Oppskrift*.
-Vil du ha vektor-SVG, åpner du `tekst.html`, velger «Åpne bestilling», limer inn *_Oppskrift* og trykker «Last ned SVG».
+På ordren står *Linje 1*, *Linje 2*, *Skrift*, *Forhåndsvisning*, *_Gravering* (PNG ved 600 DPI), *_Oppskrift* og **_SVG-fil**.
+**_SVG-fil** er en lenke til den skjulte siden `/pages/svg-eksport`. Den viser graveringen og har knapper for **SVG** (vektor, riktig størrelse i mm) og PNG, klare for LightBurn.
+Oppskriften ligger i selve lenken, og siden er skjult for søkemotorer og ikke lagt i menyen.
+Bilder Shopify viser i nettleseren, kan komme som webp. SVG-filen fra eksportsiden er alltid en ekte vektorfil.
+Bestillinger fra før SVG-lenken fantes: lim inn *_Oppskrift* på eksportsiden eller i `tekst.html`.
 
-Gjenstår: publisere «tekst-editor fiks skrifter», legge kolleksjonen i menyen, og en testbestilling.
+* Temaet **«Vessel – tekst-editor + SVG-eksport»** (ikke publisert ennå) er en kopi av «tekst-editor fiks skrifter», med SVG-lenken og eksportsiden.
+
+Gjenstår: publisere «tekst-editor + SVG-eksport», og legge kolleksjonen i menyen.
 
 > **Viktig etter forhåndsvisning:** Nettleseren husker forhåndsviste temaer. Åpne `https://myhrtreogdesign.com/?preview_theme_id=` (tom verdi) for å se det publiserte temaet igjen.
 
