@@ -3,7 +3,7 @@
 (function () {
   'use strict';
   const TE = window.TextEngrave, DS = window.DoorSign;
-  const EXAMPLE = { top1: 'Velkommen', top2: 'til vårt hjem', names: ['Ola • Kari', 'Emma • Jonas'] };
+  const EXAMPLE = { top1: 'Velkommen', top2: 'til vårt hjem', names: ['Ola · Kari', 'Emma · Jonas'] };
 
   const h = (tag, attrs = {}, ...kids) => {
     const el = document.createElement(tag);
@@ -50,15 +50,15 @@
       const input = (ph, max) => h('input', { type: 'text', maxlength: max, placeholder: ph, oninput: () => this.schedule() });
       this.top1 = input('f.eks. Velkommen', 24);
       this.top2 = input('f.eks. til vårt hjem (valgfri)', 30);
-      this.name1 = input('f.eks. Ola • Kari', 32);
-      this.name2 = input('f.eks. Emma • Jonas (valgfri)', 32);
+      this.name1 = input('f.eks. Ola · Kari', 32);
+      this.name2 = input('f.eks. Emma · Jonas (valgfri)', 32);
       const fontChips = (key) => Object.entries(TE.FONTS).map(([k, f]) => h('button', { type: 'button', class: 'fe-chip te-font', 'data-v': k,
         style: `font-family:'te-${k}',serif`, onclick: () => { this[key] = k; this.sync(); this.schedule(); } }, f.label));
       this.fontChips = fontChips('font');
       this.fontChips2 = fontChips('font2');
-      this.motifChips = Object.entries(DS.MOTIFS).map(([k, m]) => h('button', { type: 'button', class: 'fe-chip ds-motif', 'data-v': k, title: m.label,
+      this.motifChips = Object.entries(DS.MOTIFS).filter(([, m]) => !m.hidden).map(([k, m]) => h('button', { type: 'button', class: 'fe-chip ds-motif', 'data-v': k, title: m.label,
         onclick: () => { this.motif = k; this.sync(); this.schedule(); } }, h('span', { class: 'ds-icon', html: DS.motifIcon(k) || '–' }), h('span', {}, m.label)));
-      const dotBtn = (inp) => h('button', { type: 'button', class: 'fe-btn te-heart', title: 'Sett inn prikk mellom navn', onclick: () => { insertAt(inp, ' • '); this.schedule(); } }, '•');
+      const dotBtn = (inp) => h('button', { type: 'button', class: 'fe-btn te-heart', title: 'Sett inn prikk mellom navn', onclick: () => { insertAt(inp, ' · '); this.schedule(); } }, '·');
       this.info = h('p', { class: 'fe-hint' });
       this.addBtn = h('button', { type: 'button', class: 'fe-add', onclick: () => this.addToCart() });
       this.msg = h('p', { class: 'fe-msg', role: 'status' });
@@ -80,7 +80,7 @@
         h('div', { class: 'fe-section' }, h('h3', {}, 'Navn'),
           h('label', { class: 'fe-field' }, 'Linje 1', h('div', { class: 'te-inputrow' }, this.name1, dotBtn(this.name1))),
           h('label', { class: 'fe-field' }, 'Linje 2 (valgfri)', h('div', { class: 'te-inputrow' }, this.name2, dotBtn(this.name2))),
-          h('p', { class: 'fe-hint' }, 'Navnene graveres med store bokstaver, og linje 2 også med Klassisk, Romersk eller Moderne. Bruk • for å skille navn.')),
+          h('p', { class: 'fe-hint' }, 'Navnene graveres med store bokstaver, og linje 2 også med Klassisk, Romersk eller Moderne. Bruk · for å skille navn.')),
         variantEl, this.info,
         h('p', { class: 'fe-note' }, `Sort akryl med hvit gravering, ${DS.SIGN.w} × ${DS.SIGN.h} mm. Vi sjekker hver tekst før gravering.`),
         this.addBtn, this.msg,

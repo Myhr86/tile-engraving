@@ -398,21 +398,25 @@ var opentype=(()=>{var bn=Object.defineProperty;var ho=Object.getOwnPropertyDesc
     // Felles skala s (mm per em) som får alle linjer til å passe i bredde og høyde.
     let s = Infinity;
     for (let k = 0; k < used.length; k++) s = Math.min(s, iw / (used[k].b.w * scales[k]));
-    const totalH = used.reduce((a, u, k) => a + u.b.h * scales[k], 0);
+    // capFit: høyden regnes fra store bokstaver (H) i stedet for all blekk, så Å, Ø og
+    // descendere ikke krymper linjen. De stikker da litt utenfor feltet, som i vanlig typografi.
+    const lineH = (u) => (opts.capFit ? capHeight(fonts[u.i]) : u.b.h);
+    const totalH = used.reduce((a, u, k) => a + lineH(u) * scales[k], 0);
     s = Math.min(s, ih / totalH);
     if (opts.maxEm) s = Math.min(s, opts.maxEm);
 
-    const blockH = used.reduce((a, u, k) => a + u.b.h * scales[k] * s, 0) + gap;
+    const blockH = used.reduce((a, u, k) => a + lineH(u) * scales[k] * s, 0) + gap;
     let y = (H - blockH) / 2;
     const paths = [];
     const sizes = [];
     for (let k = 0; k < used.length; k++) {
       const u = used[k], sc = s * scales[k];
-      const w = u.b.w * sc, h = u.b.h * sc;
+      const w = u.b.w * sc, h = lineH(u) * sc;
       let x = (W - w) / 2;
       if (opts.align === 'left') x = margin;
       if (opts.align === 'right') x = W - margin - w;
-      paths.push(transform(u.p, sc, x - u.b.x1 * sc, y - u.b.y1 * sc));
+      // capFit: grunnlinjen legges slik at store bokstaver fyller linjehøyden
+      paths.push(transform(u.p, sc, x - u.b.x1 * sc, opts.capFit ? y + h : y - u.b.y1 * sc));
       sizes.push({ line: u.i + 1, heightMm: h, widthMm: w, fontMm: sc });
       y += h + gap;
     }

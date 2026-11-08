@@ -10,11 +10,14 @@
     label: 'Dørskilt i akryl',
     w: 146, h: 96, r: 3,
     holes: [[8, 8], [138, 8], [8, 88], [138, 88]], holeR: 2.5, capR: 6.5,
+    // Feltene er målt fra originaldesignet (fjellskiltet, 10,52 px/mm):
+    // «Velkommen» 113 × 20 mm, «TIL VÅRT HJEM» store bokstaver 9,6 mm,
+    // motiv 46–72 mm fra toppen, navn to linjer à 6,65 mm med 3,1 mm mellomrom.
     fields: {
-      top1:  { cx: 73, cy: 18.5, w: 112, h: 16 },
-      top2:  { cx: 73, cy: 35,   w: 104, h: 9 },
-      motif: { cx: 73, cy: 52.5, w: 104, h: 20 },
-      names: { cx: 73, cy: 76,   w: 112, h: 19 },
+      top1:  { cx: 73.05, cy: 14.95, w: 114, h: 20.9 },
+      top2:  { cx: 73,    cy: 35.55, w: 104, h: 10.2 },
+      motif: { cx: 73,    cy: 58.85, w: 104, h: 25.7 },
+      names: { cx: 73,    cy: 83.08, w: 112, h: 17.05 },
     },
   };
 
@@ -84,7 +87,9 @@
 
   // ---------- Motivene (boks 104 × 20 mm, origo øverst til venstre) ----------
   const MOTIFS = {
-    fjell: { label: 'Fjell', build() {
+    // Fjell: sporet fra originaldesignet (tools/trace-motif.py), med egen plassering i mm.
+    fjell: { label: 'Fjell', abs: true, rule: 'evenodd', build: () => (window.DoorSignTraced && window.DoorSignTraced.fjell) || MOTIFS.fjellTegnet.build() },
+    fjellTegnet: { label: 'Fjell (tegnet)', hidden: true, build() {
       const g = 17.2, p = [];
       // fjellet med en mørk rygglinje (hull)
       const m = [[10, g], ...quad([10, g], [22, 13], [28, 9], 8), [33, 4.2], [35, 3.4], ...quad([35, 3.4], [40, 7.5], [47, 11], 8), ...quad([47, 11], [54, 14.5], [62, g], 8)];
@@ -155,9 +160,10 @@
     const one = async (text, font, field, extra = {}) => (text ? TE.layout({ lines: [text], fonts: [font], field, margin: 0.3, ...extra }) : null);
     const top1 = await one((r.top1 && r.top1.text || '').trim(), (r.top1 && r.top1.font) || 'dancing', F.top1);
     const top2Font = r.top2Font || 'serif';
-    const top2 = await one(caseFor((r.top2 || '').trim(), top2Font), top2Font, F.top2);
-    const nl = (r.names || []).map((n) => (n || '').trim().toUpperCase());
-    const names = nl.some(Boolean) ? await TE.layout({ lines: nl, fonts: ['serif', 'serif'], ratio: 1, gap: 0.16, field: F.names, margin: 0.3, maxEm: 11 })   // maks ca. 8 mm store bokstaver, også med én linje : null;
+    const top2 = await one(caseFor((r.top2 || '').trim(), top2Font), top2Font, F.top2, { capFit: true });
+    // Stor prikk (•) gjøres om til midtprikk (·), som i originaldesignet
+    const nl = (r.names || []).map((n) => (n || '').trim().replace(/•/g, '·').toUpperCase());
+    const names = nl.some(Boolean) ? await TE.layout({ lines: nl, fonts: ['serif', 'serif'], ratio: 1, gap: 0.184, field: F.names, margin: 0.3, capFit: true, maxEm: 11.3 }) : null;   // maks ca. 8 mm store bokstaver, også med én linje
     return { top1, top2, names, motif: r.motif || 'fjell' };
   }
 
@@ -171,8 +177,10 @@
     };
     place(lay.top1, F.top1, 'topptekst');
     place(lay.top2, F.top2, 'undertekst');
-    const md = motifD(lay.motif);
-    if (md) out.push({ label: 'motiv', d: md, x: F.motif.cx - F.motif.w / 2, y: F.motif.cy - F.motif.h / 2 });
+    const md = motifD(lay.motif), M = MOTIFS[lay.motif] || {};
+    // Tegnede motiver er laget i en boks på 104 × 20 mm og sentreres i motivfeltet
+    if (md) out.push(M.abs ? { label: 'motiv', d: md, x: 0, y: 0, rule: M.rule }
+      : { label: 'motiv', d: md, x: F.motif.cx - 52, y: F.motif.cy - 10 });
     place(lay.names, F.names, 'navn');
     return out;
   }
@@ -194,7 +202,7 @@
     roundRect(ctx, 0, 0, SIGN.w, SIGN.h, SIGN.r); ctx.fillStyle = gl; ctx.fill();
     // gravering: hvit/sølvgrå, svakt matt
     ctx.fillStyle = '#e9e9e6';
-    for (const s of shapes(lay)) { ctx.save(); ctx.translate(s.x, s.y); ctx.fill(new Path2D(s.d)); ctx.restore(); }
+    for (const s of shapes(lay)) { ctx.save(); ctx.translate(s.x, s.y); ctx.fill(new Path2D(s.d), s.rule || 'nonzero'); ctx.restore(); }
     // stålholdere
     for (const [x, y] of SIGN.holes) {
       ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 1.2 * ppm; ctx.shadowOffsetX = 0.4 * ppm; ctx.shadowOffsetY = 0.6 * ppm;
@@ -209,7 +217,7 @@
   // ---------- SVG til LightBurn: hele skiltet i mm ----------
   function toSVG(lay, { outline = true } = {}) {
     const { w, h, r } = SIGN;
-    const parts = shapes(lay).map((s) => `  <path id="${s.label}" transform="translate(${f(s.x)} ${f(s.y)})" d="${s.d}" fill="#000000"/>`).join('\n');
+    const parts = shapes(lay).map((s) => `  <path id="${s.label}" transform="translate(${f(s.x)} ${f(s.y)})" d="${s.d}" fill="#000000"${s.rule === 'evenodd' ? ' fill-rule="evenodd"' : ''}/>`).join('\n');
     const ref = outline ? `  <g id="plate" fill="none" stroke="#ff0000" stroke-width="0.1">
     <rect x="0" y="0" width="${w}" height="${h}" rx="${r}" ry="${r}"/>
 ${SIGN.holes.map(([x, y]) => `    <circle cx="${x}" cy="${y}" r="${SIGN.holeR}"/>`).join('\n')}
@@ -226,16 +234,17 @@ ${ref}${parts}
     const ppm = dpi / 25.4, c = document.createElement('canvas');
     c.width = Math.round(SIGN.w * ppm); c.height = Math.round(SIGN.h * ppm);
     const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height); ctx.scale(ppm, ppm); ctx.fillStyle = '#000';
-    for (const s of shapes(lay)) { ctx.save(); ctx.translate(s.x, s.y); ctx.fill(new Path2D(s.d)); ctx.restore(); }
+    for (const s of shapes(lay)) { ctx.save(); ctx.translate(s.x, s.y); ctx.fill(new Path2D(s.d), s.rule || 'nonzero'); ctx.restore(); }
     const blob = await new Promise((res) => c.toBlob(res, 'image/png'));
     return window.Engrave && Engrave.pngWithDpi ? Engrave.pngWithDpi(blob, dpi) : blob;
   }
 
   // Lite ikon av et motiv (SVG-markup) til valgknappene
   function motifIcon(key) {
-    const d = motifD(key), F = SIGN.fields.motif;
+    const d = motifD(key), F = SIGN.fields.motif, M = MOTIFS[key] || {};
     if (!d) return '';
-    return `<svg viewBox="0 0 ${F.w} ${F.h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="${d}" fill="currentColor"/></svg>`;
+    const vb = M.abs ? `${F.cx - 52} ${F.cy - F.h / 2} 104 ${F.h}` : `0 0 104 20`;
+    return `<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="${d}" fill="currentColor" fill-rule="${M.rule || 'nonzero'}"/></svg>`;
   }
 
   window.DoorSign = { caseFor, SIGN, MOTIFS, layout, render, toSVG, toPNG, motifIcon };
