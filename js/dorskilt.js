@@ -146,14 +146,18 @@
   const motifD = (key) => (motifCache[key] = motifCache[key] || (MOTIFS[key] || MOTIFS.ingen).build());
 
   // ---------- Oppsett ----------
-  // recipe: { top1: {text, font}, top2, motif, names: [l1, l2] }
+  // recipe: { top1: {text, font}, top2, top2Font, motif, names: [l1, l2] }
+  // Skrivestiler graveres som skrevet, de andre skriftene med store bokstaver.
+  const SCRIPT_FONTS = ['script', 'dancing'];
+  const caseFor = (text, font) => (SCRIPT_FONTS.includes(font) ? text : text.toUpperCase());
   async function layout(r) {
     const F = SIGN.fields;
     const one = async (text, font, field, extra = {}) => (text ? TE.layout({ lines: [text], fonts: [font], field, margin: 0.3, ...extra }) : null);
     const top1 = await one((r.top1 && r.top1.text || '').trim(), (r.top1 && r.top1.font) || 'dancing', F.top1);
-    const top2 = await one((r.top2 || '').trim().toUpperCase(), 'serif', F.top2);
+    const top2Font = r.top2Font || 'serif';
+    const top2 = await one(caseFor((r.top2 || '').trim(), top2Font), top2Font, F.top2);
     const nl = (r.names || []).map((n) => (n || '').trim().toUpperCase());
-    const names = nl.some(Boolean) ? await TE.layout({ lines: nl, fonts: ['serif', 'serif'], ratio: 1, gap: 0.16, field: F.names, margin: 0.3 }) : null;
+    const names = nl.some(Boolean) ? await TE.layout({ lines: nl, fonts: ['serif', 'serif'], ratio: 1, gap: 0.16, field: F.names, margin: 0.3, maxEm: 11 })   // maks ca. 8 mm store bokstaver, også med én linje : null;
     return { top1, top2, names, motif: r.motif || 'fjell' };
   }
 
@@ -234,5 +238,5 @@ ${ref}${parts}
     return `<svg viewBox="0 0 ${F.w} ${F.h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="${d}" fill="currentColor"/></svg>`;
   }
 
-  window.DoorSign = { SIGN, MOTIFS, layout, render, toSVG, toPNG, motifIcon };
+  window.DoorSign = { caseFor, SIGN, MOTIFS, layout, render, toSVG, toPNG, motifIcon };
 })();

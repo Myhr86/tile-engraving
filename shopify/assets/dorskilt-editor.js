@@ -682,14 +682,18 @@ ${frame ? `  <rect x="0" y="0" width="${w}" height="${h}" fill="none" stroke="#f
   const motifD = (key) => (motifCache[key] = motifCache[key] || (MOTIFS[key] || MOTIFS.ingen).build());
 
   // ---------- Oppsett ----------
-  // recipe: { top1: {text, font}, top2, motif, names: [l1, l2] }
+  // recipe: { top1: {text, font}, top2, top2Font, motif, names: [l1, l2] }
+  // Skrivestiler graveres som skrevet, de andre skriftene med store bokstaver.
+  const SCRIPT_FONTS = ['script', 'dancing'];
+  const caseFor = (text, font) => (SCRIPT_FONTS.includes(font) ? text : text.toUpperCase());
   async function layout(r) {
     const F = SIGN.fields;
     const one = async (text, font, field, extra = {}) => (text ? TE.layout({ lines: [text], fonts: [font], field, margin: 0.3, ...extra }) : null);
     const top1 = await one((r.top1 && r.top1.text || '').trim(), (r.top1 && r.top1.font) || 'dancing', F.top1);
-    const top2 = await one((r.top2 || '').trim().toUpperCase(), 'serif', F.top2);
+    const top2Font = r.top2Font || 'serif';
+    const top2 = await one(caseFor((r.top2 || '').trim(), top2Font), top2Font, F.top2);
     const nl = (r.names || []).map((n) => (n || '').trim().toUpperCase());
-    const names = nl.some(Boolean) ? await TE.layout({ lines: nl, fonts: ['serif', 'serif'], ratio: 1, gap: 0.16, field: F.names, margin: 0.3 }) : null;
+    const names = nl.some(Boolean) ? await TE.layout({ lines: nl, fonts: ['serif', 'serif'], ratio: 1, gap: 0.16, field: F.names, margin: 0.3, maxEm: 11 })   // maks ca. 8 mm store bokstaver, også med én linje : null;
     return { top1, top2, names, motif: r.motif || 'fjell' };
   }
 
@@ -770,7 +774,7 @@ ${ref}${parts}
     return `<svg viewBox="0 0 ${F.w} ${F.h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="${d}" fill="currentColor"/></svg>`;
   }
 
-  window.DoorSign = { SIGN, MOTIFS, layout, render, toSVG, toPNG, motifIcon };
+  window.DoorSign = { caseFor, SIGN, MOTIFS, layout, render, toSVG, toPNG, motifIcon };
 })();
 
 /* ---- shop/svg-eksport.js ---- */
@@ -926,6 +930,7 @@ ${ref}${parts}
       this.cartUrl = root.dataset.cartUrl || '/cart';
       this.exportUrl = root.dataset.exportUrl || '';
       this.font = 'dancing';
+      this.font2 = 'serif';
       this.motif = 'fjell';
       this.build();
       this.loadFontFaces();
@@ -948,8 +953,10 @@ ${ref}${parts}
       this.top2 = input('f.eks. til vårt hjem (valgfri)', 30);
       this.name1 = input('f.eks. Ola • Kari', 32);
       this.name2 = input('f.eks. Emma • Jonas (valgfri)', 32);
-      this.fontChips = Object.entries(TE.FONTS).map(([k, f]) => h('button', { type: 'button', class: 'fe-chip te-font', 'data-v': k,
-        style: `font-family:'te-${k}',serif`, onclick: () => { this.font = k; this.sync(); this.schedule(); } }, f.label));
+      const fontChips = (key) => Object.entries(TE.FONTS).map(([k, f]) => h('button', { type: 'button', class: 'fe-chip te-font', 'data-v': k,
+        style: `font-family:'te-${k}',serif`, onclick: () => { this[key] = k; this.sync(); this.schedule(); } }, f.label));
+      this.fontChips = fontChips('font');
+      this.fontChips2 = fontChips('font2');
       this.motifChips = Object.entries(DS.MOTIFS).map(([k, m]) => h('button', { type: 'button', class: 'fe-chip ds-motif', 'data-v': k, title: m.label,
         onclick: () => { this.motif = k; this.sync(); this.schedule(); } }, h('span', { class: 'ds-icon', html: DS.motifIcon(k) || '–' }), h('span', {}, m.label)));
       const dotBtn = (inp) => h('button', { type: 'button', class: 'fe-btn te-heart', title: 'Sett inn prikk mellom navn', onclick: () => { insertAt(inp, ' • '); this.schedule(); } }, '•');
@@ -968,12 +975,13 @@ ${ref}${parts}
         h('div', { class: 'fe-section' }, h('h3', {}, 'Tekst øverst'),
           h('label', { class: 'fe-field' }, 'Topptekst', this.top1),
           h('div', { class: 'fe-row te-fonts' }, this.fontChips),
-          h('label', { class: 'fe-field' }, 'Linje 2 (valgfri)', this.top2)),
+          h('label', { class: 'fe-field' }, 'Linje 2 (valgfri)', this.top2),
+          h('div', { class: 'fe-row te-fonts' }, this.fontChips2)),
         h('div', { class: 'fe-section' }, h('h3', {}, 'Motiv'), h('div', { class: 'fe-row ds-motifs' }, this.motifChips)),
         h('div', { class: 'fe-section' }, h('h3', {}, 'Navn'),
           h('label', { class: 'fe-field' }, 'Linje 1', h('div', { class: 'te-inputrow' }, this.name1, dotBtn(this.name1))),
           h('label', { class: 'fe-field' }, 'Linje 2 (valgfri)', h('div', { class: 'te-inputrow' }, this.name2, dotBtn(this.name2))),
-          h('p', { class: 'fe-hint' }, 'Linje 2 under topptekst og navnene graveres med store bokstaver. Bruk • for å skille navn.')),
+          h('p', { class: 'fe-hint' }, 'Navnene graveres med store bokstaver, og linje 2 også med Klassisk, Romersk eller Moderne. Bruk • for å skille navn.')),
         variantEl, this.info,
         h('p', { class: 'fe-note' }, `Sort akryl med hvit gravering, ${DS.SIGN.w} × ${DS.SIGN.h} mm. Vi sjekker hver tekst før gravering.`),
         this.addBtn, this.msg,
@@ -983,6 +991,7 @@ ${ref}${parts}
 
     sync() {
       for (const c of this.fontChips) c.classList.toggle('active', c.dataset.v === this.font);
+      for (const c of this.fontChips2) c.classList.toggle('active', c.dataset.v === this.font2);
       for (const c of this.motifChips) c.classList.toggle('active', c.dataset.v === this.motif);
       this.updateButton();
     }
@@ -992,7 +1001,7 @@ ${ref}${parts}
     recipe(example) {
       return { v: 1, type: 'dorskilt', product: 'dorskilt', motif: this.motif,
         top1: { text: example ? EXAMPLE.top1 : this.top1.value.trim(), font: this.font },
-        top2: example ? EXAMPLE.top2 : this.top2.value.trim(),
+        top2: example ? EXAMPLE.top2 : this.top2.value.trim(), top2Font: this.font2,
         names: example ? EXAMPLE.names : [this.name1.value.trim(), this.name2.value.trim()] };
     }
 
@@ -1032,11 +1041,11 @@ ${ref}${parts}
         fd.append('id', this.variantId);
         fd.append('quantity', 1);
         if (r.top1.text) fd.append('properties[Topptekst]', r.top1.text);
-        if (r.top2) fd.append('properties[Linje 2]', r.top2.toUpperCase());
+        if (r.top2) fd.append('properties[Linje 2]', DS.caseFor(r.top2, r.top2Font));
         fd.append('properties[Motiv]', DS.MOTIFS[r.motif].label);
         const nm = r.names.filter(Boolean).map((n) => n.toUpperCase());
         if (nm.length) fd.append('properties[Navn]', nm.join(' / '));
-        fd.append('properties[Skrift]', TE.FONTS[r.top1.font].label);
+        fd.append('properties[Skrift]', r.top2 ? `${TE.FONTS[r.top1.font].label} / ${TE.FONTS[r.top2Font].label}` : TE.FONTS[r.top1.font].label);
         const c = document.createElement('canvas');
         DS.render(c, lay, { ppm: 5 });
         fd.append('properties[Forhåndsvisning]', new File([await toBlob(c, 'image/jpeg', 0.9)], 'forhandsvisning.jpg', { type: 'image/jpeg' }));
