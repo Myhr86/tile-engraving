@@ -55,7 +55,15 @@ Bestillinger fra før SVG-lenken fantes: lim inn *_Oppskrift* på eksportsiden e
 * Temaet **«Vessel – familietre-editor»** (ikke publisert ennå) er en kopi av «tekst-editor + SVG-eksport», og har familietre-editoren og en rettelse for vinåpneren: tekst i Løkkeskrift med B, O og noen andre bokstaver forsvant før.
 * Etter publisering: «Slik bestiller du» i beskrivelsen sier fortsatt «Trykk på spesielle instruksjoner», og må oppdateres.
 
-Gjenstår: publisere «familietre-editor», oppdatere beskrivelsen på familietreet, og legge kolleksjonen i menyen.
+### Dørskilt i akryl
+* **«Personlig dørskilt i akryl»** (`/products/dorskilt-i-akryl`) har nå én variant (439 kr) i stedet for «Fjellmotiv» og «Tekst med hjerte», fordi motivet velges i editoren. Variant-ID-en til «Fjellmotiv» beholdes. Lagerstyringen er som før, med 5 på lager (1 + 4 fra de to gamle variantene).
+* Editoren: topptekst (fem skrifter), valgfri linje 2 (store bokstaver), motiv (Fjell, Hjerte, Hytte, Skog, Fyrlykt eller Uten motiv) og navn på to linjer. Skiltet tegnes rett forfra, 146 × 96 mm.
+* Motivene er tegnet som vektorer i `js/dorskilt.js` (`MOTIFS`), og feltene ligger i `SIGN.fields`. Plasseringen er anslått ut fra bildene.
+* På ordren står *Topptekst*, *Linje 2*, *Motiv*, *Navn*, *Skrift*, *Forhåndsvisning*, *_Oppskrift* og **_SVG-fil** (hele skiltet i mm, med røde hårstreker for plate og hull).
+* «Farge» i beskrivelsen er rettet til «Sort akryl med hvit gravering». «Slik bestiller du» sier fortsatt «spesielle instruksjoner», og må oppdateres når editoren er publisert.
+* Temaet **«Vessel – dørskilt-editor»** (ikke publisert ennå) er en kopi av «familietre-editor», som er publisert, og har i tillegg dørskilt-editoren.
+
+Gjenstår: publisere «dørskilt-editor», oppdatere «Slik bestiller du» på dørskiltet, og legge kolleksjonen i menyen.
 
 > **Viktig etter forhåndsvisning:** Nettleseren husker forhåndsviste temaer. Åpne `https://myhrtreogdesign.com/?preview_theme_id=` (tom verdi) for å se det publiserte temaet igjen.
 
