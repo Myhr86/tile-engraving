@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tekstgravering</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .views { display: block; }
+    .mock { background: #000; border-radius: 6px; overflow: hidden; margin-bottom: 14px; }
+    .mock canvas { display: block; width: 100%; height: auto; background: none; }
+    .tech { background: #fff; border-radius: 6px; padding: 18px; }
+    .tech canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .sizes { color: var(--muted); font-size: 13px; margin-top: 8px; }
+    .sizes .warn { color: var(--accent); }
+    .line { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin: 8px 0; }
+    .line select { width: 100%; margin-top: 6px; }
+    .heart { padding: 4px 10px; font-size: 16px; }
+    nav.top { padding: 0 20px; } nav.top a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Tekstgravering</h1>
+    <p>Skriv teksten, se hvordan den blir på produktet, og last ned SVG eller PNG til LightBurn. <a href="index.html" style="color:var(--accent)">← Bildegravering</a></p>
+  </header>
+
+  <main>
+    <aside class="panel">
+      <details class="order">
+        <summary>Åpne bestilling fra nettbutikken</summary>
+        <p class="hint">Kopier teksten i «_Oppskrift» fra ordren og lim den inn her.</p>
+        <label class="field">Oppskrift <textarea id="recipe" rows="3" placeholder='{"v":1,"type":"tekst",…}'></textarea></label>
+        <p id="orderStatus" class="hint"></p>
+      </details>
+
+      <section>
+        <h2>1. Produkt og felt</h2>
+        <label>Produkt <select id="product"></select></label>
+        <div class="row">
+          <label>Bredde (mm) <input type="number" id="fw" step="0.5" min="5"></label>
+          <label>Høyde (mm) <input type="number" id="fh" step="0.5" min="2"></label>
+        </div>
+      </section>
+
+      <section>
+        <h2>2. Tekst</h2>
+        <div class="line">
+          <label class="field">Linje 1 <input type="text" id="l1" value="Gunnvor ♥ Steinar"></label>
+          <div class="row"><select id="f1"></select><button class="small heart" data-for="l1" title="Sett inn hjerte">♥</button></div>
+        </div>
+        <div class="line">
+          <label class="field">Linje 2 (valgfri) <input type="text" id="l2" value="1985"></label>
+          <div class="row"><select id="f2"></select><button class="small heart" data-for="l2" title="Sett inn hjerte">♥</button></div>
+        </div>
+        <label class="slider"><span>Størrelse linje 2 (i forhold til linje 1)<output id="o_ratio"></output></span><input type="range" id="ratio" min="0.35" max="1" step="0.01" value="0.6"></label>
+        <label class="slider"><span>Avstand mellom linjene<output id="o_gap"></output></span><input type="range" id="gap" min="0" max="0.25" step="0.01" value="0.06"></label>
+        <label>Justering
+          <select id="align"><option value="center">Midtstilt</option><option value="left">Venstre</option><option value="right">Høyre</option></select>
+        </label>
+        <p class="hint">Teksten tilpasses automatisk feltet. Skriv ♥ eller &lt;3 for hjerte.</p>
+      </section>
+
+      <section>
+        <h2>3. Eksport til LightBurn</h2>
+        <label><input type="checkbox" id="frame"> Ta med feltramme i SVG (rød, for plassering)</label>
+        <button id="svgBtn" class="primary">Last ned SVG (vektor, mm)</button>
+        <div class="row" style="margin-top:12px">
+          <label>PNG-oppløsning
+            <select id="dpi"><option>300</option><option selected>600</option><option>1000</option></select> DPI
+          </label>
+          <label><input type="checkbox" id="transp"> Gjennomsiktig</label>
+        </div>
+        <button id="pngBtn" class="small">Last ned PNG</button>
+        <p class="hint">SVG-filen har riktig størrelse i millimeter. I LightBurn: <em>Fil → Importer</em>, så får teksten nøyaktig feltets størrelse.</p>
+      </section>
+    </aside>
+
+    <section class="views">
+      <figure>
+        <figcaption>Slik blir den (nærbilde) <label class="inline"><input type="checkbox" id="showField"> vis feltet</label></figcaption>
+        <div class="mock"><canvas id="zoom"></canvas></div>
+      </figure>
+      <figure>
+        <figcaption>Hele produktet</figcaption>
+        <div class="mock" style="max-width:520px"><canvas id="full"></canvas></div>
+      </figure>
+      <figure>
+        <figcaption>Graveringsfilen (feltet er stiplet)</figcaption>
+        <div class="tech"><canvas id="tech"></canvas></div>
+        <div class="sizes" id="sizes"></div>
+      </figure>
+    </section>
+  </main>
+
+  <script src="vendor/opentype.min.js"></script>
+  <script src="js/processing.js"></script>
+  <script src="js/textengrave.js"></script>
+  <script src="js/tekst-app.js"></script>
+</body>
+</html>

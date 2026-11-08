@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Demo – tekst-editor</title>
+  <link rel="stylesheet" href="editor.css">
+  <style>body { font-family: system-ui, sans-serif; margin: 16px; background: #fafafa; } .wrap { max-width: 560px; margin: 0 auto; }</style>
+</head>
+<body>
+  <p>Lokal demo av tekst-editoren (vinåpner). Må åpnes via en webserver (skriftene lastes med fetch). «Legg i handlekurven» virker bare i Shopify.</p>
+  <div class="wrap">
+    <div data-tekst-editor data-product="korketrekker"
+      data-variants='[{"id":44610064547897,"title":"Default Title","price":"209,00 kr","available":true}]'
+      data-assets='{"image":"img/korketrekker-tom.jpg","fonts":{"script":"../fonts/great-vibes-latin-400-normal.woff","dancing":"../fonts/dancing-script-latin-700-normal.woff","serif":"../fonts/playfair-display-latin-700-normal.woff","roman":"../fonts/cinzel-latin-700-normal.woff","sans":"../fonts/montserrat-latin-600-normal.woff"}}'></div>
+  </div>
+  <script src="../vendor/opentype.min.js"></script>
+  <script src="../js/processing.js"></script>
+  <script src="../js/textengrave.js"></script>
+  <script src="tekst-editor.js"></script>
+</body>
+</html>

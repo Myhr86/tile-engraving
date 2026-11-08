@@ -79,7 +79,23 @@ def template(preset, heading, intro, link):
       "order": ["main", "flis_editor"],
     }
 
+def tekst_template(heading, intro, link):
+    """Produktmal med tekst-editoren (gravert tekst), f.eks. personlig vinåpner."""
+    t = template("hund", heading, intro, link)
+    t["sections"]["main"]["blocks"]["product-details"]["blocks"]["group_main"]["blocks"]["flis_link"]["settings"]["text"] = \
+        f'<p><a href="#lag-gravering"><strong>{link}</strong></a></p>'
+    del t["sections"]["flis_editor"]
+    t["sections"]["tekst_editor"] = {"type": "tekst-editor", "settings": {
+        "product_type": "korketrekker", "image_asset": "korketrekker-tom.jpg",
+        "heading": heading, "intro": intro, "padding_top": 36, "padding_bottom": 60}}
+    t["order"] = ["main", "tekst_editor"]
+    return t
+
 os.makedirs("shopify/templates", exist_ok=True)
+with open("shopify/templates/product.tekst-vinapner.json", "w") as f:
+    json.dump(tekst_template("Lag din gravering",
+        "<p>Skriv inn navn, årstall eller en kort hilsen, og velg skrift. Du ser med en gang hvordan graveringen blir på vinåpneren.</p>",
+        "Skriv teksten din og se graveringen ↓"), f, ensure_ascii=False, indent=2)
 for key, heading, intro, link in [
     ("hund", "Lag flisen med din hund",
      "<p>Last opp et bilde av hunden, plasser det i ruten og legg gjerne til navnet. Vi graverer det på en 20 × 20 cm keramisk flis.</p>",

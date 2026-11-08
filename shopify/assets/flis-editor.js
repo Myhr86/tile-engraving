@@ -1,4 +1,4 @@
-/* Flis-editor for Myhr Tre og Design. GENERERT av tools/build-shopify.mjs – ikke rediger her. */
+/* Myhr Tre og Design. GENERERT av tools/build-shopify.mjs – ikke rediger her. */
 
 /* ---- js/presets.js ---- */
 // Forhåndsinnstillinger ("presets").

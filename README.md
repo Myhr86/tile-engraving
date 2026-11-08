@@ -38,10 +38,22 @@ Skriv navnet på hunden eller hytta i feltet **Navn**. Du kan også legge til en
 
 En enkel kundeversjon ligger i `shop/`, og de ferdige temafilene i `shopify/`. Se **[SHOPIFY.md](SHOPIFY.md)** for hvordan du installerer den, og hvordan du åpner bestillinger i dette verktøyet.
 
+## Tekstgravering (vinåpner m.m.)
+`tekst.html` er verktøyet ditt for gravert tekst. Skriv én eller to linjer, velg skrift, se teksten brent inn på produktet, og last ned:
+* **SVG** med ekte vektorer og riktig størrelse i millimeter (50 × 9 mm for vinåpneren). Importer rett i LightBurn.
+* **PNG** i 300, 600 eller 1000 DPI.
+
+Teksten tilpasses feltet automatisk, og ♥ eller `<3` blir et hjerte. Bestillinger fra nettbutikken åpnes med «Åpne bestilling» (lim inn «_Oppskrift»).
+Siden laster skriftene med `fetch`, så den må åpnes via en webserver, for eksempel `python3 -m http.server`, eller GitHub Pages. Den virker ikke som lokal fil.
+
+Kunde-editoren ligger i `shop/tekst-editor.js` (demo: `shop/tekst-demo.html`). Skriftene ligger i `fonts/` (OFL-lisens, se `fonts/LICENSE.md`), og opentype.js i `vendor/` (MIT).
+
 ## Mapper
 * `index.html`, `js/app.js`: graveringsverktøyet ditt (admin)
 * `js/presets.js`, `js/processing.js`, `js/crop.js`, `js/text.js`: felles kjerne
-* `shop/`: kunde-editor for nettbutikken
+* `shop/`: kunde-editorer for nettbutikken (bilde og tekst)
+* `tekst.html`, `js/tekst-app.js`, `js/textengrave.js`: tekstgravering
+* `fonts/`, `vendor/`: skrifter og opentype.js
 * `shopify/`: ferdige filer til Shopify-temaet, bygget med `node tools/build-shopify.mjs`
 
 ## Egne stiler
