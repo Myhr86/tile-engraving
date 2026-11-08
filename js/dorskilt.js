@@ -86,6 +86,7 @@
   }
 
   // ---------- Motivene (boks 104 × 20 mm, origo øverst til venstre) ----------
+  const traced = (key, label) => ({ label, abs: true, rule: 'evenodd', build: () => (window.DoorSignTraced && window.DoorSignTraced[key]) || '' });
   const MOTIFS = {
     // Fjell: sporet fra originaldesignet (tools/trace-motif.py), med egen plassering i mm.
     fjell: { label: 'Fjell', abs: true, rule: 'evenodd', build: () => (window.DoorSignTraced && window.DoorSignTraced.fjell) || MOTIFS.fjellTegnet.build() },
@@ -103,10 +104,19 @@
       p.push(dots(6, 98, 19.6));
       return p.join(' ');
     } },
-    hjerte: { label: 'Hjerte', build() {
+    // Strektegnede motiver sporet fra motivarket (tools/trace-motifs.py), allerede plassert i motivfeltet.
+    hus: traced('hus', 'Hus'),
+    blomster: traced('blomster', 'Blomster'),
+    hjerter: traced('hjerter', 'Hjerter'),
+    hjort: traced('hjort', 'Hjort'),
+    pote: traced('pote', 'Pote'),
+    fisk: traced('fisk', 'Fisk'),
+    eng: traced('eng', 'Eng'),
+    // Eldre tegnede motiver: skjult i editoren, men beholdt så tidligere bestillinger kan eksporteres.
+    hjerte: { label: 'Hjerte', hidden: true, build() {
       return [taper(14, 46, 10.6, 0.9), taper(58, 90, 10.6, 0.9), heart(52, 10.4, 6.6)].join(' ');
     } },
-    hytte: { label: 'Hytte', build() {
+    hytte: { label: 'Hytte', hidden: true, build() {
       const g = 17.2, p = [];
       p.push(taper(8, 96, g + 0.15, 0.7));
       // hytta: vegg med dør og vinduer som hull, tak med utstikk og pipe
@@ -121,7 +131,7 @@
       p.push(star(16, 6, 1.0), star(88, 5, 1.1), star(93, 9.5, 0.6));
       return p.join(' ');
     } },
-    skog: { label: 'Skog', build() {
+    skog: { label: 'Skog', hidden: true, build() {
       const g = 17.2, p = [taper(8, 96, g + 0.15, 0.7)];
       for (const [x, h] of [[24, 9], [31, 13], [38, 10.5], [46, 15.5], [54, 12], [61, 14], [69, 10], [76, 12.5], [83, 8.5]]) p.push(pine(x, g, h));
       // halvmåne (sirkel minus forskjøvet sirkel) og stjerner
@@ -129,7 +139,7 @@
       p.push(star(14, 5, 1.0), star(18.5, 9, 0.6), star(86, 9, 0.6));
       return p.join(' ');
     } },
-    fyr: { label: 'Fyrlykt', build() {
+    fyr: { label: 'Fyrlykt', hidden: true, build() {
       const p = [];
       // tårn (trapes) med to mørke striper, lanterne, tak og lysstråler
       p.push(poly([[48.2, 16.4], [55.8, 16.4], [54.4, 6.2], [49.6, 6.2]]));

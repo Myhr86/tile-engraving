@@ -57,8 +57,8 @@ Bestillinger fra før SVG-lenken fantes: lim inn *_Oppskrift* på eksportsiden e
 
 ### Dørskilt i akryl
 * **«Personlig dørskilt i akryl»** (`/products/dorskilt-i-akryl`) har nå én variant (439 kr) i stedet for «Fjellmotiv» og «Tekst med hjerte», fordi motivet velges i editoren. Variant-ID-en til «Fjellmotiv» beholdes. Lagerstyringen er som før, med 5 på lager (1 + 4 fra de to gamle variantene).
-* Editoren: topptekst (fem skrifter), valgfri linje 2 (store bokstaver), motiv (Fjell, Hjerte, Hytte, Skog, Fyrlykt eller Uten motiv) og navn på to linjer. Skiltet tegnes rett forfra, 146 × 96 mm.
-* Motivene er tegnet som vektorer i `js/dorskilt.js` (`MOTIFS`), og feltene ligger i `SIGN.fields`. Feltene er målt fra originaldesignet til fjellskiltet.
+* Editoren: topptekst (fem skrifter), valgfri linje 2 (store bokstaver), motiv (Fjell, Hus, Blomster, Hjerter, Hjort, Pote, Fisk, Eng eller Uten motiv) og navn på to linjer. Skiltet tegnes rett forfra, 146 × 96 mm.
+* Motivene ligger i `js/dorskilt.js` (`MOTIFS`), og feltene ligger i `SIGN.fields`. Fjell er sporet fra originaldesignet (`tools/trace-motif.py` → `js/dorskilt-motiv-fjell.js`). De sju strekmotivene er sporet fra motivarket (`tools/trace-motifs.py` → `js/dorskilt-motiver.js`) og skalert til motivfeltet (104 × 25,7 mm). De gamle tegnede motivene (Hjerte, Hytte, Skog, Fyrlykt) er skjult i editoren, men beholdt slik at eldre bestillinger fortsatt kan eksporteres. Feltene er målt fra originaldesignet til fjellskiltet.
 * På ordren står *Topptekst*, *Linje 2*, *Motiv*, *Navn*, *Skrift*, *Forhåndsvisning*, *_Oppskrift* og **_SVG-fil** (hele skiltet i mm, med røde hårstreker for plate og hull).
 * «Farge» i beskrivelsen er rettet til «Sort akryl med hvit gravering». «Slik bestiller du» er skrevet om til editoren.
 * Temaet **«Vessel – dørskilt-editor»** er publisert.
