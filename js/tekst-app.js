@@ -66,7 +66,7 @@
   }
 
   function fileName(ext) {
-    const base = [$('l1').value, $('l2').value].join(' ').replace(/[♥❤]/g, 'og').replace(/[^\wæøåÆØÅ ]+/g, '').trim().replace(/\s+/g, '-').slice(0, 40) || 'gravering';
+    const base = [$('l1').value, $('l2').value].join(' ').replace(/[♥❤]/g, 'og').replace(/[æÆ]/g, 'ae').replace(/[øØ]/g, 'o').replace(/[åÅ]/g, 'a').replace(/[^\w ]+/g, '').trim().replace(/\s+/g, '-').slice(0, 40) || 'gravering';
     return `${product().label.toLowerCase()}_${base}.${ext}`;
   }
 

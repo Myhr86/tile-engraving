@@ -31,7 +31,8 @@ const embed = (name, images) => {
 const core = ['vendor/opentype.min.js', 'js/processing.js', 'js/textengrave.js'];
 bundle('tekst-editor.js', [embed('tekst', ['korketrekker-tom.jpg']), ...core, 'shop/svg-eksport.js', 'shop/tekst-editor.js']);
 bundle('familietre-editor.js', [embed('familietre', ['familietre-mdf.jpg', 'familietre-lakk.jpg']), ...core, 'js/familietre.js', 'shop/svg-eksport.js', 'shop/familietre-editor.js']);
-bundle('svg-eksport.js', [embed('eksport', ['korketrekker-tom.jpg']), ...core, 'js/familietre.js', 'shop/svg-eksport.js']);
+bundle('dorskilt-editor.js', [embed('dorskilt', []), ...core, 'js/dorskilt.js', 'shop/svg-eksport.js', 'shop/dorskilt-editor.js']);
+bundle('svg-eksport.js', [embed('eksport', ['korketrekker-tom.jpg']), ...core, 'js/familietre.js', 'js/dorskilt.js', 'shop/svg-eksport.js']);
 writeFileSync(join(root, 'shopify/assets/flis-editor.css'), header + readFileSync(join(root, 'shop/editor.css'), 'utf8'));
 for (const f of readdirSync(join(root, 'fonts')).filter((f) => f.endsWith('.woff'))) copyFileSync(join(root, 'fonts', f), join(root, 'shopify/assets', f));
 copyFileSync(join(root, 'shop/img/korketrekker-tom.jpg'), join(root, 'shopify/assets/korketrekker-tom.jpg'));

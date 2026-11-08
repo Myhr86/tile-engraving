@@ -42,3 +42,8 @@
 .familietre-editor .ft-names input::placeholder { text-transform: none; }
 .familietre-editor .ft-count { font-weight: normal; color: var(--fe-muted); font-size: .9em; }
 .familietre-editor .fe-chip:disabled { opacity: .45; cursor: default; }
+/* Dørskilt-editor */
+.dorskilt-editor .ds-motifs .fe-chip { flex: 1 1 30%; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px; font-size: 13px; }
+.dorskilt-editor .ds-icon { display: block; width: 100%; height: 26px; background: #111; color: #eee; border-radius: 4px; padding: 3px; }
+.dorskilt-editor .ds-icon svg { width: 100%; height: 100%; display: block; }
+.dorskilt-editor .te-heart { color: #111; }

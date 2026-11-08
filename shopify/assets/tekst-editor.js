@@ -563,7 +563,7 @@ ${frame ? `  <rect x="0" y="0" width="${w}" height="${h}" fill="none" stroke="#f
   };
 
   function fileName(r, ext) {
-    const base = (r.lines || []).join(' ').replace(/[♥❤]/g, 'og').replace(/[^\wæøåÆØÅ ]+/g, '').trim().replace(/\s+/g, '-').slice(0, 40) || 'gravering';
+    const base = (r.lines || []).join(' ').replace(/[♥❤]/g, 'og').replace(/[æÆ]/g, 'ae').replace(/[øØ]/g, 'o').replace(/[åÅ]/g, 'a').replace(/[^\w ]+/g, '').trim().replace(/\s+/g, '-').slice(0, 40) || 'gravering';
     return `${r.product || 'gravering'}_${base}.${ext}`;
   }
   function download(blob, name) {
@@ -588,8 +588,19 @@ ${frame ? `  <rect x="0" y="0" width="${w}" height="${h}" fill="none" stroke="#f
     let r = null, res = null;
 
     let tree = null;   // familietre-oppsett
+    let door = null;   // dørskilt-oppsett
     async function show(recipe) {
       r = recipe;
+      if (r.type === 'dorskilt' && window.DoorSign) {
+        door = await DoorSign.layout(r); tree = null; res = null;
+        mock.hidden = false; DoorSign.render(mock, door, { ppm: 5 });
+        tech.hidden = true;
+        info.textContent = `Dørskilt ${DoorSign.SIGN.w} × ${DoorSign.SIGN.h} mm, motiv: ${(DoorSign.MOTIFS[r.motif] || {}).label || ''}. ` +
+          'SVG-filen er hele skiltet i riktig størrelse. Røde hårstreker viser plate og hull.';
+        msg.textContent = '';
+        return;
+      }
+      door = null; tech.hidden = false;
       if (r.type === 'familietre' && window.FamilyTree) {
         tree = await FamilyTree.layout(r); res = null;
         mock.hidden = true;
@@ -616,11 +627,13 @@ ${frame ? `  <rect x="0" y="0" width="${w}" height="${h}" fill="none" stroke="#f
     }
 
     svgBtn.onclick = () => {
-      if (tree) download(new Blob([FamilyTree.toSVG(tree)], { type: 'image/svg+xml' }), fileName({ product: 'familietre', lines: [r.bottom.text] }, 'svg'));
+      if (door) download(new Blob([DoorSign.toSVG(door)], { type: 'image/svg+xml' }), fileName({ product: 'dorskilt', lines: r.names }, 'svg'));
+      else if (tree) download(new Blob([FamilyTree.toSVG(tree)], { type: 'image/svg+xml' }), fileName({ product: 'familietre', lines: [r.bottom.text] }, 'svg'));
       else if (res) download(new Blob([TE.toSVG(res)], { type: 'image/svg+xml' }), fileName(r, 'svg'));
     };
     pngBtn.onclick = async () => {
-      if (tree) download(await FamilyTree.toPNG(tree, 600), fileName({ product: 'familietre', lines: [r.bottom.text] }, 'png'));
+      if (door) download(await DoorSign.toPNG(door, 600), fileName({ product: 'dorskilt', lines: r.names }, 'png'));
+      else if (tree) download(await FamilyTree.toPNG(tree, 600), fileName({ product: 'familietre', lines: [r.bottom.text] }, 'png'));
       else if (res) download(await TE.toPNG(res, 600), fileName(r, 'png'));
     };
     paste.addEventListener('input', () => {

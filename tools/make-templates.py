@@ -125,3 +125,18 @@ with open("shopify/templates/product.familietre.json", "w") as f:
     json.dump(familietre_template("Lag ditt familietre",
         "<p>Velg utførelse, skriv teksten nederst, for eksempel «Oldemor», og opptil 16 navn på hjertene. Du ser med en gang hvordan familietreet blir.</p>",
         "Lag ditt familietre med navn ↓"), f, ensure_ascii=False, indent=2)
+
+def dorskilt_template(heading, intro, link):
+    """Produktmal med dørskilt-editoren."""
+    t = familietre_template(heading, intro, link)
+    t["sections"]["main"]["blocks"]["product-details"]["blocks"]["group_main"]["blocks"]["flis_link"]["settings"]["text"] = \
+        f'<p><a href="#lag-dorskilt"><strong>{link}</strong></a></p>'
+    t["sections"]["dorskilt_editor"] = t["sections"].pop("familietre_editor")
+    t["sections"]["dorskilt_editor"]["type"] = "dorskilt-editor"
+    t["order"] = ["main", "dorskilt_editor"]
+    return t
+
+with open("shopify/templates/product.dorskilt.json", "w") as f:
+    json.dump(dorskilt_template("Lag ditt dørskilt",
+        "<p>Skriv topptekst og navn, og velg motiv i midten. Du ser med en gang hvordan dørskiltet blir.</p>",
+        "Lag ditt dørskilt ↓"), f, ensure_ascii=False, indent=2)
