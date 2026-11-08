@@ -31,17 +31,32 @@
   const cache = {};
   let fontUrl = (key) => 'fonts/' + FONTS[key].file;
   function setFontUrls(fn) { fontUrl = fn; }
+  // I nettbutikken er skriftene bakt inn i skriptet (window.TextEngraveEmbedded), så de
+  // ikke må hentes som egne filer. Ellers hentes de med fetch (admin-siden og demoen).
+  function fontBuffer(key) {
+    const emb = window.TextEngraveEmbedded && window.TextEngraveEmbedded.fonts && window.TextEngraveEmbedded.fonts[key];
+    if (emb) {
+      const bin = atob(emb), buf = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+      return Promise.resolve(buf.buffer);
+    }
+    const url = fontUrl(key);
+    return fetch(url)
+      .catch((e) => { throw new Error(`kunne ikke hente ${url} (${e.message})`); })
+      .then((r) => { if (!r.ok) throw new Error(`${url} svarte ${r.status}`); return r.arrayBuffer(); });
+  }
   function loadFont(key) {
+    if (!FONTS[key]) return Promise.reject(new Error('ukjent skrift: ' + key));
     if (!cache[key]) {
-      cache[key] = fetch(fontUrl(key))
-        .then((r) => { if (!r.ok) throw new Error('Fant ikke skrift: ' + key); return r.arrayBuffer(); })
+      cache[key] = fontBuffer(key)
         .then((buf) => {
           const font = opentype.parse(buf);
           // Noen skrifter (f.eks. Great Vibes) har kontekst-varianter (GSUB) som opentype.js
           // ikke støtter. De trengs ikke for gravering, så de fjernes hvis de feiler.
           try { font.getPath('Aa æøå 19', 0, 0, 1, GLYPH_OPTS); } catch (e) { delete font.tables.gsub; }
           return font;
-        });
+        })
+        .catch((e) => { delete cache[key]; throw new Error(`Skriften «${FONTS[key].label}»: ${e.message}`); });
     }
     return cache[key];
   }
@@ -247,5 +262,11 @@ ${frame ? `  <rect x="0" y="0" width="${w}" height="${h}" fill="none" stroke="#f
     }
   }
 
-  window.TextEngrave = { FONTS, PRODUCTS, setFontUrls, loadFont, layout, toSVG, toPNG, draw, renderMock };
+  // Produktbilde: innebygd (data-URL) i nettbutikken, ellers vanlig URL.
+  function imageSrc(product, fallback) {
+    const emb = window.TextEngraveEmbedded && window.TextEngraveEmbedded.images && window.TextEngraveEmbedded.images[product.image];
+    return emb || fallback;
+  }
+
+  window.TextEngrave = { FONTS, PRODUCTS, setFontUrls, loadFont, fontBuffer, imageSrc, layout, toSVG, toPNG, draw, renderMock };
 })();

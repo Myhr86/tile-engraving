@@ -40,15 +40,18 @@
       this.loadFontFaces();
       const img = new Image();
       img.onload = () => { this.img = img; this.schedule(); };
-      img.src = this.assets.image || ('shop/img/' + this.product.image);
+      img.onerror = () => { this.msg.textContent = 'Klarte ikke å laste produktbildet. Last siden på nytt.'; };
+      img.src = TE.imageSrc(this.product, this.assets.image || ('shop/img/' + this.product.image));
     }
 
-    // Vis skriftknappene i sin egen skrift
+    // Vis skriftknappene i sin egen skrift (samme skriftdata som graveringen bruker)
     loadFontFaces() {
-      if (!window.FontFace || !this.assets.fonts) return;
-      for (const [k, url] of Object.entries(this.assets.fonts)) {
-        const ff = new FontFace('te-' + k, `url(${url})`);
-        ff.load().then((f) => document.fonts.add(f)).catch(() => {});
+      if (!window.FontFace) return;
+      for (const k of Object.keys(TE.FONTS)) {
+        TE.fontBuffer(k)
+          .then((buf) => new FontFace('te-' + k, buf).load())
+          .then((f) => document.fonts.add(f))
+          .catch(() => {});
       }
     }
 
@@ -123,7 +126,7 @@
       try {
         this.res = await TE.layout(this.layoutOpts(example));
       } catch (e) {
-        console.error(e); this.msg.textContent = 'Klarte ikke å laste skriftene. Last siden på nytt.'; return;
+        console.error(e); this.msg.textContent = `Klarte ikke å laste skriftene (${e.message}). Last siden på nytt, eller kontakt oss.`; return;
       }
       this.badge.hidden = !example;
       if (this.img) TE.renderMock(this.canvas, this.img, this.product, this.res, { zoom: 'tight', scale: 3 });

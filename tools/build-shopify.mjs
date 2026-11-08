@@ -16,7 +16,18 @@ const bundle = (out, parts) => {
   console.log(`Skrev shopify/assets/${out} (${(js.length / 1024).toFixed(1)} kB)`);
 };
 bundle('flis-editor.js', ['js/presets.js', 'js/processing.js', 'js/crop.js', 'js/text.js', 'shop/editor.js']);
-bundle('tekst-editor.js', ['vendor/opentype.min.js', 'js/processing.js', 'js/textengrave.js', 'shop/tekst-editor.js']);
+// Skrifter og produktbilde bakes inn i tekst-editor.js, så butikken ikke må hente dem
+// som egne filer (unngår problemer med domener/CORS og «tainted» canvas).
+const b64 = (p) => readFileSync(join(root, p)).toString('base64');
+const fontFiles = { script: 'great-vibes-latin-400-normal.woff', dancing: 'dancing-script-latin-700-normal.woff',
+  serif: 'playfair-display-latin-700-normal.woff', roman: 'cinzel-latin-700-normal.woff', sans: 'montserrat-latin-600-normal.woff' };
+const embedded = {
+  fonts: Object.fromEntries(Object.entries(fontFiles).map(([k, f]) => [k, b64('fonts/' + f)])),
+  images: { 'korketrekker-tom.jpg': 'data:image/jpeg;base64,' + b64('shop/img/korketrekker-tom.jpg') },
+};
+writeFileSync(join(root, 'js/embedded-assets.generated.js'),
+  '/* GENERERT av tools/build-shopify.mjs: skrifter (OFL, se fonts/LICENSE.md) og produktbilde. */\nwindow.TextEngraveEmbedded = ' + JSON.stringify(embedded) + ';\n');
+bundle('tekst-editor.js', ['js/embedded-assets.generated.js', 'vendor/opentype.min.js', 'js/processing.js', 'js/textengrave.js', 'shop/tekst-editor.js']);
 writeFileSync(join(root, 'shopify/assets/flis-editor.css'), header + readFileSync(join(root, 'shop/editor.css'), 'utf8'));
 for (const f of readdirSync(join(root, 'fonts')).filter((f) => f.endsWith('.woff'))) copyFileSync(join(root, 'fonts', f), join(root, 'shopify/assets', f));
 copyFileSync(join(root, 'shop/img/korketrekker-tom.jpg'), join(root, 'shopify/assets/korketrekker-tom.jpg'));
