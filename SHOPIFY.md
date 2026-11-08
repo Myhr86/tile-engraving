@@ -60,11 +60,11 @@ Bestillinger fra før SVG-lenken fantes: lim inn *_Oppskrift* på eksportsiden e
 * Editoren: topptekst (fem skrifter), valgfri linje 2 (store bokstaver), motiv (Fjell, Hjerte, Hytte, Skog, Fyrlykt eller Uten motiv) og navn på to linjer. Skiltet tegnes rett forfra, 146 × 96 mm.
 * Motivene er tegnet som vektorer i `js/dorskilt.js` (`MOTIFS`), og feltene ligger i `SIGN.fields`. Plasseringen er anslått ut fra bildene.
 * På ordren står *Topptekst*, *Linje 2*, *Motiv*, *Navn*, *Skrift*, *Forhåndsvisning*, *_Oppskrift* og **_SVG-fil** (hele skiltet i mm, med røde hårstreker for plate og hull).
-* «Farge» i beskrivelsen er rettet til «Sort akryl med hvit gravering». «Slik bestiller du» sier fortsatt «spesielle instruksjoner», og må oppdateres når editoren er publisert.
+* «Farge» i beskrivelsen er rettet til «Sort akryl med hvit gravering». «Slik bestiller du» er skrevet om til editoren.
 * Temaet **«Vessel – dørskilt-editor»** er publisert.
 * Temaet **«Vessel – dørskilt linje 2 skrift»** (ikke publisert ennå) har skriftvalg for linje 2 og en grense for navnestørrelsen.
 
-Gjenstår: publisere «dørskilt linje 2 skrift», oppdatere «Slik bestiller du» på dørskiltet, og legge kolleksjonen i menyen.
+Gjenstår: publisere «dørskilt linje 2 skrift», og legge kolleksjonen i menyen.
 
 > **Viktig etter forhåndsvisning:** Nettleseren husker forhåndsviste temaer. Åpne `https://myhrtreogdesign.com/?preview_theme_id=` (tom verdi) for å se det publiserte temaet igjen.
 
