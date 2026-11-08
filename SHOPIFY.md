@@ -33,7 +33,16 @@ Egenskaper som starter med `_`, skjules for kunden, men står på ordren i Shopi
   - malen `templates/product.flis-familie.json`.
 * Produktet **«Familieflis med eget bilde»** (`/products/familieflis-med-eget-bilde`) er aktivt i nettbutikken, til 499 kr, og koblet til malen `flis-familie`. Det har to bilder: Skjærseth-flisen i ramme på veggen, og selve motivet. Det ligger i kolleksjonen «Personlige fliser».
 
-Gjenstår: å legge kolleksjonen i menyen, og en testbestilling.
+* Temaet **«Vessel – flis + tekst-editor»** (ikke publisert ennå, 8. november) er en kopi av «flis-editor + familie», og har i tillegg tekst-editoren:
+  `assets/tekst-editor.js`, de fem skriftene (`.woff`), `assets/korketrekker-tom.jpg`, `sections/tekst-editor.liquid` og `templates/product.tekst-vinapner.json`.
+* **«Personlig vinåpner»** (`/products/personlig-vinapner`, 209 kr) er koblet til malen `tekst-vinapner`. Den vises først når temaet over er publisert. Til da ser kundene den gamle siden.
+* Etter publisering: produktbeskrivelsen sier fortsatt «Trykk på spesielle instruksjoner …» under «Slik bestiller du», og må oppdateres.
+
+### Tekstbestillinger (vinåpner)
+På ordren står *Linje 1*, *Linje 2*, *Skrift*, *Forhåndsvisning*, *_Gravering* (PNG ved 600 DPI, klar for LightBurn) og *_Oppskrift*.
+Vil du ha vektor-SVG, åpner du `tekst.html`, velger «Åpne bestilling», limer inn *_Oppskrift* og trykker «Last ned SVG».
+
+Gjenstår: publisere «flis + tekst-editor», oppdatere beskrivelsen på vinåpneren, legge kolleksjonen i menyen, og en testbestilling.
 
 > **Viktig etter forhåndsvisning:** Nettleseren husker forhåndsviste temaer. Åpne `https://myhrtreogdesign.com/?preview_theme_id=` (tom verdi) for å se det publiserte temaet igjen.
 
