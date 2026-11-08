@@ -48,7 +48,14 @@ Bestillinger fra før SVG-lenken fantes: lim inn *_Oppskrift* på eksportsiden e
 
 * Temaet **«Vessel – tekst-editor + SVG-eksport»** (ikke publisert ennå) er en kopi av «tekst-editor fiks skrifter», med SVG-lenken og eksportsiden.
 
-Gjenstår: publisere «tekst-editor + SVG-eksport», og legge kolleksjonen i menyen.
+### Familietre
+* **«Familietre»** (`/products/familietre`) har fått opsjonen **Utførelse**: *Ubehandlet MDF* (489 kr, samme variant-ID som før) og *Lakkert* (539 kr). Begge lages på bestilling, uten lagerstyring. Produktet er koblet til malen `familietre`.
+* Editoren: utførelse, tekst nederst (190 × 40 mm, fem skrifter) og opptil 16 navn (26 × 7 mm på hjertene, store bokstaver). På ordren står *Tekst nederst*, *Skrift*, *Antall hjerter*, *Navn*, *Forhåndsvisning*, *_Oppskrift* og **_SVG-fil**. Lenken gir et SVG-ark med bunnteksten øverst og navnene i hjerter under, med røde hårstreker for felt og omriss.
+* Feltmålene er et anslag ut fra bildene. De justeres i `js/familietre.js` (`bottomField`, `nameField`, `heart`).
+* Temaet **«Vessel – familietre-editor»** (ikke publisert ennå) er en kopi av «tekst-editor + SVG-eksport», og har familietre-editoren og en rettelse for vinåpneren: tekst i Løkkeskrift med B, O og noen andre bokstaver forsvant før.
+* Etter publisering: «Slik bestiller du» i beskrivelsen sier fortsatt «Trykk på spesielle instruksjoner», og må oppdateres.
+
+Gjenstår: publisere «familietre-editor», oppdatere beskrivelsen på familietreet, og legge kolleksjonen i menyen.
 
 > **Viktig etter forhåndsvisning:** Nettleseren husker forhåndsviste temaer. Åpne `https://myhrtreogdesign.com/?preview_theme_id=` (tom verdi) for å se det publiserte temaet igjen.
 
