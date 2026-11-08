@@ -41,6 +41,7 @@
         data-variants="{{ variants_json | strip | escape }}"
         data-assets="{{ assets_json | strip | escape }}"
         data-cart-url="{{ routes.cart_url }}"
+        data-export-url="{{ shop.url }}/pages/{{ section.settings.export_page }}"
       ><p style="text-align:center; padding:40px 0; opacity:.7;">Laster graveringsverktøyet …</p></div>
     </div>
   {%- endif -%}
@@ -73,6 +74,12 @@
       "type": "product",
       "id": "product",
       "label": "Produkt (bare nødvendig hvis seksjonen ikke ligger på en produktside)"
+    },
+    {
+      "type": "text",
+      "id": "export_page",
+      "label": "Handle til SVG-eksportsiden (lenken på ordren)",
+      "default": "svg-eksport"
     },
     { "type": "text", "id": "heading", "label": "Overskrift", "default": "Lag din gravering" },
     {

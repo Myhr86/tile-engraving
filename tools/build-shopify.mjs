@@ -27,7 +27,8 @@ const embedded = {
 };
 writeFileSync(join(root, 'js/embedded-assets.generated.js'),
   '/* GENERERT av tools/build-shopify.mjs: skrifter (OFL, se fonts/LICENSE.md) og produktbilde. */\nwindow.TextEngraveEmbedded = ' + JSON.stringify(embedded) + ';\n');
-bundle('tekst-editor.js', ['js/embedded-assets.generated.js', 'vendor/opentype.min.js', 'js/processing.js', 'js/textengrave.js', 'shop/tekst-editor.js']);
+bundle('tekst-editor.js', ['js/embedded-assets.generated.js', 'vendor/opentype.min.js', 'js/processing.js', 'js/textengrave.js', 'shop/svg-eksport.js', 'shop/tekst-editor.js']);
+bundle('svg-eksport.js', ['js/embedded-assets.generated.js', 'vendor/opentype.min.js', 'js/processing.js', 'js/textengrave.js', 'shop/svg-eksport.js']);
 writeFileSync(join(root, 'shopify/assets/flis-editor.css'), header + readFileSync(join(root, 'shop/editor.css'), 'utf8'));
 for (const f of readdirSync(join(root, 'fonts')).filter((f) => f.endsWith('.woff'))) copyFileSync(join(root, 'fonts', f), join(root, 'shopify/assets', f));
 copyFileSync(join(root, 'shop/img/korketrekker-tom.jpg'), join(root, 'shopify/assets/korketrekker-tom.jpg'));

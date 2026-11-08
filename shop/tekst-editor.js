@@ -34,6 +34,7 @@
       this.variants = JSON.parse(root.dataset.variants || '[]');
       this.variantId = (this.variants.find((v) => v.available) || this.variants[0] || {}).id;
       this.cartUrl = root.dataset.cartUrl || '/cart';
+      this.exportUrl = root.dataset.exportUrl || '';
       this.fonts = ['script', 'serif'];
       if (this.assets.fonts) TE.setFontUrls((k) => this.assets.fonts[k]);
       this.build();
@@ -166,6 +167,8 @@
         fd.append('properties[Forhåndsvisning]', new File([await toBlob(c, 'image/jpeg', 0.88)], 'forhandsvisning.jpg', { type: 'image/jpeg' }));
         fd.append('properties[_Gravering]', new File([await TE.toPNG(res, 600)], 'gravering-600dpi.png', { type: 'image/png' }));
         fd.append('properties[_Oppskrift]', JSON.stringify(r));
+        // Lenke til SVG-eksportsiden i nettbutikken, med oppskriften i lenken (#…)
+        if (this.exportUrl && window.TekstOppskrift) fd.append('properties[_SVG-fil]', this.exportUrl + '#' + window.TekstOppskrift.encode(r));
         const root = (window.Shopify && window.Shopify.routes && window.Shopify.routes.root) || '/';
         const resp = await fetch(root + 'cart/add.js', { method: 'POST', body: fd, headers: { Accept: 'application/json' } });
         if (!resp.ok) {

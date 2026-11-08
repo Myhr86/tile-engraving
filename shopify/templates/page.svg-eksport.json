@@ -1,0 +1,6 @@
+{
+  "sections": {
+    "eksport": { "type": "svg-eksport", "settings": { "heading": "Graveringsfil til LightBurn" } }
+  },
+  "order": ["eksport"]
+}
