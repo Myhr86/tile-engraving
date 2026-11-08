@@ -170,7 +170,20 @@
     return { paths, field: opts.field, sizes };
   }
 
-  const pathData = (paths, dec = 3) => paths.map((p) => p.toPathData(dec)).join(' ');
+  // Egen SVG-stiserialisering. opentype.js 2.0 sin toPathData() gir NaN når en kontur
+  // starter med to like punkter (f.eks. B og O i Dancing Script), og da forkastes hele stien.
+  function toD(path, dec = 3) {
+    const f = (v) => { const r = +v.toFixed(dec); return Object.is(r, -0) ? '0' : String(r); };
+    let d = '';
+    for (const c of path.commands) {
+      if (c.type === 'M' || c.type === 'L') d += c.type + f(c.x) + ' ' + f(c.y);
+      else if (c.type === 'Q') d += 'Q' + f(c.x1) + ' ' + f(c.y1) + ' ' + f(c.x) + ' ' + f(c.y);
+      else if (c.type === 'C') d += 'C' + f(c.x1) + ' ' + f(c.y1) + ' ' + f(c.x2) + ' ' + f(c.y2) + ' ' + f(c.x) + ' ' + f(c.y);
+      else if (c.type === 'Z') d += 'Z';
+    }
+    return d;
+  }
+  const pathData = (paths, dec = 3) => paths.map((p) => toD(p, dec)).join(' ');
 
   // ---------- Eksport ----------
   // SVG i millimeter: LightBurn leser width/height i mm og plasserer i riktig størrelse.
@@ -268,5 +281,5 @@ ${frame ? `  <rect x="0" y="0" width="${w}" height="${h}" fill="none" stroke="#f
     return emb || fallback;
   }
 
-  window.TextEngrave = { FONTS, PRODUCTS, setFontUrls, loadFont, fontBuffer, imageSrc, layout, toSVG, toPNG, draw, renderMock };
+  window.TextEngrave = { toD, pathData, FONTS, PRODUCTS, setFontUrls, loadFont, fontBuffer, imageSrc, layout, toSVG, toPNG, draw, renderMock };
 })();

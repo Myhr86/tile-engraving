@@ -36,3 +36,9 @@
 .tekst-editor .te-inputrow input { margin-top: 0; flex: 1; }
 .tekst-editor .te-heart { width: 46px; font-size: 20px; color: #b3261e; }
 .tekst-editor .te-fonts .fe-chip { min-width: 0; flex: 1 1 30%; font-size: 17px; padding: 8px 6px; }
+/* Familietre-editor */
+.familietre-editor .ft-names { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.familietre-editor .ft-names input { width: 100%; padding: 10px; font-size: 16px; color: #111; border: 1px solid var(--fe-line); border-radius: 6px; background: #fff; text-transform: uppercase; }
+.familietre-editor .ft-names input::placeholder { text-transform: none; }
+.familietre-editor .ft-count { font-weight: normal; color: var(--fe-muted); font-size: .9em; }
+.familietre-editor .fe-chip:disabled { opacity: .45; cursor: default; }

@@ -91,6 +91,17 @@ def tekst_template(heading, intro, link):
     t["order"] = ["main", "tekst_editor"]
     return t
 
+def familietre_template(heading, intro, link):
+    """Produktmal med familietre-editoren."""
+    t = template("hund", heading, intro, link)
+    t["sections"]["main"]["blocks"]["product-details"]["blocks"]["group_main"]["blocks"]["flis_link"]["settings"]["text"] = \
+        f'<p><a href="#lag-familietre"><strong>{link}</strong></a></p>'
+    del t["sections"]["flis_editor"]
+    t["sections"]["familietre_editor"] = {"type": "familietre-editor", "settings": {
+        "export_page": "svg-eksport", "heading": heading, "intro": intro, "padding_top": 36, "padding_bottom": 60}}
+    t["order"] = ["main", "familietre_editor"]
+    return t
+
 os.makedirs("shopify/templates", exist_ok=True)
 with open("shopify/templates/product.tekst-vinapner.json", "w") as f:
     json.dump(tekst_template("Lag din gravering",
@@ -110,3 +121,7 @@ for key, heading, intro, link in [
     with open(f"shopify/templates/product.flis-{key}.json", "w") as f:
         json.dump(template(key, heading, intro, link), f, ensure_ascii=False, indent=2)
 print("ok")
+with open("shopify/templates/product.familietre.json", "w") as f:
+    json.dump(familietre_template("Lag ditt familietre",
+        "<p>Velg utførelse, skriv teksten nederst, for eksempel «Oldemor», og opptil 16 navn på hjertene. Du ser med en gang hvordan familietreet blir.</p>",
+        "Lag ditt familietre med navn ↓"), f, ensure_ascii=False, indent=2)

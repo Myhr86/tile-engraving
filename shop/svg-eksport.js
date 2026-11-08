@@ -51,8 +51,19 @@
     const imgReady = new Promise((ok) => { img.onload = ok; img.onerror = ok; });
     let r = null, res = null;
 
+    let tree = null;   // familietre-oppsett
     async function show(recipe) {
       r = recipe;
+      if (r.type === 'familietre' && window.FamilyTree) {
+        tree = await FamilyTree.layout(r); res = null;
+        mock.hidden = true;
+        FamilyTree.drawSheet(tech, tree, 4);
+        info.textContent = `Familietre (${(FamilyTree.PRODUCT.variants[r.finish] || {}).label || ''}): «${r.bottom.text}» og ${tree.names.length} navnehjerter. ` +
+          'SVG-arket har bunnteksten øverst og navnene i hjerter under. Røde hårstreker viser felt og hjerteomriss.';
+        msg.textContent = '';
+        return;
+      }
+      tree = null; mock.hidden = false;
       const product = TE.PRODUCTS[r.product] || TE.PRODUCTS.korketrekker;
       if (!img.src) img.src = TE.imageSrc(product, '');
       res = await TE.layout({ lines: r.lines, fonts: r.fonts, ratio: r.ratio, gap: r.gap, align: r.align, field: r.field || product.field });
@@ -68,8 +79,14 @@
       msg.textContent = '';
     }
 
-    svgBtn.onclick = () => { if (res) download(new Blob([TE.toSVG(res)], { type: 'image/svg+xml' }), fileName(r, 'svg')); };
-    pngBtn.onclick = async () => { if (res) download(await TE.toPNG(res, 600), fileName(r, 'png')); };
+    svgBtn.onclick = () => {
+      if (tree) download(new Blob([FamilyTree.toSVG(tree)], { type: 'image/svg+xml' }), fileName({ product: 'familietre', lines: [r.bottom.text] }, 'svg'));
+      else if (res) download(new Blob([TE.toSVG(res)], { type: 'image/svg+xml' }), fileName(r, 'svg'));
+    };
+    pngBtn.onclick = async () => {
+      if (tree) download(await FamilyTree.toPNG(tree, 600), fileName({ product: 'familietre', lines: [r.bottom.text] }, 'png'));
+      else if (res) download(await TE.toPNG(res, 600), fileName(r, 'png'));
+    };
     paste.addEventListener('input', () => {
       const raw = paste.value.trim(); if (!raw) return;
       try { show(JSON.parse(raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1))); } catch (e) { msg.textContent = 'Klarte ikke å lese oppskriften.'; }
