@@ -4,7 +4,9 @@ Bruk: python3 -I tools/trace-motifs.py <motivark.png/webp> > js/dorskilt-motiver
 
 Arket har lys bakgrunn med tynne mørke streker og myke preg-skygger. Strekene hentes
 ut med «blackhat» (lukking minus bilde), som tar vare på tynne linjer og fjerner
-skyggene. Hvert motiv skaleres til å passe i skiltets motivfelt (104 × 25,7 mm,
+skyggene. Deretter gjøres strektegningen om til samme stil som fjellmotivet: små
+åpninger tettes, lukkede konturer (blader, hjerter, kronblader, dyrekropper) fylles,
+og streker inni de fylte flatene blir mørke detaljlinjer. Hvert motiv skaleres til å passe i skiltets motivfelt (104 × 25,7 mm,
 midt på (73, 58,85)) og skrives i skiltets mm-koordinater. Krever: opencv, potracer.
 """
 import sys, json
@@ -18,6 +20,10 @@ BOX = {
     'hjort': (795, 284, 1512, 532), 'pote': (860, 549, 1474, 779), 'fisk': (95, 769, 784, 1004),
     'eng': (838, 770, 1470, 1009),
 }
+# Hvor store åpninger (mm) som tettes før lukkede flater fylles
+CLOSE_MM = {'blomster': 0.3, 'pote': 0.8}
+# Flater som skal fylles selv om konturen har større åpning: punkt (x, y) i utsnittet, 2× forstørret
+SEEDS = {'pote': [(873, 245)]}
 FIELD = {'cx': 73, 'cy': 58.85, 'w': 104, 'h': 25.7}
 UP = 2
 
@@ -33,13 +39,35 @@ def strokes(crop):
     m = cv2.morphologyEx(m, cv2.MORPH_OPEN, np.ones((2, 2), np.uint8))
     n, lab, st, _ = cv2.connectedComponentsWithStats(m)
     keep = np.isin(lab, [i for i in range(1, n) if st[i, 4] >= 25 * UP * UP])
-    return keep
+    return keep.astype(np.uint8)
+
+def disk(r):
+    return cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * r + 1, 2 * r + 1))
+
+def solid(S, pxmm, close_mm, seeds=()):
+    """Fyll lukkede konturer; streker inni fylte flater blir mørke linjer."""
+    S = np.pad(S, 10)
+    C = cv2.morphologyEx(S, cv2.MORPH_CLOSE, disk(max(1, round(close_mm * pxmm))))
+    n, lab, st, _ = cv2.connectedComponentsWithStats((1 - C).astype(np.uint8), connectivity=4)
+    H, W = S.shape
+    inside = [i for i in range(1, n) if st[i, 0] > 0 and st[i, 1] > 0 and st[i, 0] + st[i, 2] < W and st[i, 1] + st[i, 3] < H]
+    R = C | np.isin(lab, inside).astype(np.uint8)
+    if seeds:   # tett hardere rundt valgte flater og fyll dem
+        C2 = cv2.morphologyEx(S, cv2.MORPH_CLOSE, disk(round(1.5 * pxmm)))
+        _, lab2 = cv2.connectedComponents((1 - C2).astype(np.uint8), connectivity=4)
+        for x, y in seeds:
+            if lab2[y + 10, x + 10]: R |= (lab2 == lab2[y + 10, x + 10]).astype(np.uint8)
+    cut = S & cv2.erode(R, disk(max(1, round(0.35 * pxmm))))
+    return cv2.dilate(R, disk(max(1, round(0.1 * pxmm)))) & (1 - cut)
 
 f = lambda v: format(round(v, 2), 'g')
 print('// GENERERT av tools/trace-motifs.py fra motivarket. Koordinater i mm på skiltet (146 × 96), fyllregel evenodd.')
 print('window.DoorSignTraced = window.DoorSignTraced || {};')
 for name, (x0, y0, x1, y1) in BOX.items():
-    ink = strokes(gray[y0:y1, x0:x1])
+    S = strokes(gray[y0:y1, x0:x1])
+    ys, xs = np.where(S)
+    pxmm = max((xs.max() - xs.min()) / FIELD['w'], (ys.max() - ys.min()) / FIELD['h'])
+    ink = solid(S, pxmm, CLOSE_MM.get(name, 0.5), SEEDS.get(name, ())).astype(bool)
     ys, xs = np.where(ink)
     bx0, bx1, by0, by1 = xs.min(), xs.max() + 1, ys.min(), ys.max() + 1
     s = min(FIELD['w'] / (bx1 - bx0), FIELD['h'] / (by1 - by0))      # mm per piksel
