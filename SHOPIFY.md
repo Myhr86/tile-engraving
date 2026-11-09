@@ -62,7 +62,8 @@ Bestillinger fra før SVG-lenken fantes: lim inn *_Oppskrift* på eksportsiden e
 * På ordren står *Topptekst*, *Linje 2*, *Motiv*, *Navn*, *Skrift*, *Forhåndsvisning*, *_Oppskrift* og **_SVG-fil** (hele skiltet i mm, med røde hårstreker for plate og hull).
 * «Farge» i beskrivelsen er rettet til «Sort akryl med hvit gravering». «Slik bestiller du» er skrevet om til editoren.
 * Temaet **«Vessel – dørskilt-editor»** er publisert.
-* Temaet **«Vessel – dørskilt linje 2 skrift»** (ikke publisert ennå) har skriftvalg for linje 2, en grense for navnestørrelsen, **fjell-motivet fra originaldesignet** (sporet med `tools/trace-motif.py`), og feltmål tatt fra originalen. Det har også de sju nye strekmotivene (commit 023e08c), og produktbeskrivelsen lister de nye motivene.
+* Temaet **«Vessel – dørskilt linje 2 skrift»** er publisert (skriftvalg for linje 2, fjellmotivet fra originalen, de sju strekmotivene).
+* Temaet **«Vessel – dørskilt fylte motiver»** (ikke publisert ennå) har strekmotivene i samme stil som fjell: lukkede konturer er fylt, og strekene er kraftigere (commit 6d9ac31). Hvor hardt åpninger tettes styres per motiv med `CLOSE_MM` og `SEEDS` i `tools/trace-motifs.py`.
 
 Gjenstår: publisere «dørskilt linje 2 skrift», og legge kolleksjonen i menyen.
 
