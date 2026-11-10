@@ -111,3 +111,12 @@ node tools/build-shopify.mjs
 ```
 
 `shop/demo.html` viser editoren lokalt uten Shopify. Knappen for handlekurv virker bare i butikken.
+
+## Bilflis med kundens bil (AI)
+
+* Produktet **«Bilflis med din bil»** (`/products/bilflis-med-din-bil`, 499 kr, mal `bilflis`) er opprettet som **utkast**. Det ligger i «Personlige fliser – eget bilde» og har de to flisebildene (Mustang og Volvo Amazon) som produktbilder.
+* Kunden velger stil (*Røyk og brostein* eller *Stormnatt*) og laster opp et bilde av bilen. Bildetjenesten (`worker/bilflis`, Cloudflare Worker) sender stilbildet og bilfotoet til OpenAI (`gpt-image-2`, bilderedigering). Kunden ser bildet bygges i ca. 1 minutt.
+* Stilbildene er de originale OpenAI-bildene, lastet opp som `bilflis-stil1.png` og `bilflis-stil2.png` under *Innhold → Filer*. Instruksjonene til AI-en ligger i `worker/bilflis/src/index.js`.
+* På ordren står *Stil*, **Bilde** (ferdig PNG for LightBurn) og *Bilfoto* (kundens original). Bildet behandles ikke videre, så du bruker dine vanlige innstillinger.
+* Kvoter: 3 forsøk per kunde per døgn og 60 totalt per døgn (kan endres i Cloudflare).
+* Temaet **«Vessel – bilflis (AI)»** (ikke publisert) har seksjonen, editoren og malen. Adressen til bildetjenesten må fylles inn i seksjonen når workeren er satt opp. Se `worker/bilflis/README.md`.
