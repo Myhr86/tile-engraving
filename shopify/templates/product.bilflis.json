@@ -326,7 +326,7 @@
     "bilflis_editor": {
       "type": "bilflis-editor",
       "settings": {
-        "api_url": "",
+        "api_url": "https://bilflis.zarfox86.workers.dev",
         "stil1_label": "Røyk og brostein",
         "stil2_label": "Stormnatt",
         "stil1_image": "shopify://shop_images/bilflis-stil1.png",

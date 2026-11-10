@@ -157,4 +157,4 @@ def bilflis_template(heading, intro, link, api_url=""):
 with open("shopify/templates/product.bilflis.json", "w") as f:
     json.dump(bilflis_template("Lag din bilflis",
         "<p>Velg stil og last opp et bilde av bilen din. Vi setter bilen inn i bildet, og du ser resultatet før du bestiller.</p>",
-        "Lag din bilflis ↓"), f, ensure_ascii=False, indent=2)
+        "Lag din bilflis ↓", "https://bilflis.zarfox86.workers.dev"), f, ensure_ascii=False, indent=2)
