@@ -1,0 +1,24 @@
+# Cloudflare Worker for bilflisen. Se README.md for oppsett.
+name = "bilflis"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+# Kvoter (antall forsøk). Lag navnerommet med:
+#   npx wrangler kv namespace create LIMITS
+# og lim inn id-en under.
+[[kv_namespaces]]
+binding = "LIMITS"
+id = "SETT_INN_KV_ID"
+
+[vars]
+# Bare disse adressene får bruke serveren (kommaseparert).
+ALLOWED_ORIGINS = "https://myhrtreogdesign.com,https://www.myhrtreogdesign.com,https://uxac0y-us.myshopify.com"
+MODEL = "gpt-image-2"
+QUALITY = "high"
+MAX_PER_IP = "3"      # forsøk per kunde (IP-adresse) per døgn
+MAX_PER_DAY = "60"    # forsøk totalt per døgn (kostnadstak)
+STYLE_URL_STIL1 = "https://cdn.shopify.com/s/files/1/0725/2154/7833/files/bilflis-stil1.png?v=1794327800"
+STYLE_URL_STIL2 = "https://cdn.shopify.com/s/files/1/0725/2154/7833/files/bilflis-stil2.png?v=1794327801"
+
+# API-nøkkelen legges inn som hemmelighet, aldri her:
+#   npx wrangler secret put OPENAI_API_KEY

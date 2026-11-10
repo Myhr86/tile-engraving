@@ -1,0 +1,75 @@
+{%- comment -%}
+  Bilflis-editor: kunden velger stil, laster opp et bilde av bilen sin, og bildetjenesten
+  (Cloudflare Worker, se worker/bilflis) setter bilen inn i stilbildet med AI.
+  Krever assets: bilflis-editor.js og flis-editor.css.
+{%- endcomment -%}
+{%- liquid
+  assign p = product
+  if p == blank and section.settings.product != blank
+    assign p = all_products[section.settings.product]
+  endif
+  if section.settings.stil1_image != blank
+    assign thumb1 = section.settings.stil1_image | image_url: width: 600
+  else
+    assign thumb1 = 'https://cdn.shopify.com/s/files/1/0725/2154/7833/files/bilflis-stil1.png?width=600'
+  endif
+  if section.settings.stil2_image != blank
+    assign thumb2 = section.settings.stil2_image | image_url: width: 600
+  else
+    assign thumb2 = 'https://cdn.shopify.com/s/files/1/0725/2154/7833/files/bilflis-stil2.png?width=600'
+  endif
+-%}
+{%- capture variants_json -%}
+  [{%- for v in p.variants -%}{"id":{{ v.id }},"title":{{ v.title | json }},"price":{{ v.price | money | strip_html | json }},"available":{{ v.available }}}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]
+{%- endcapture -%}
+{%- capture styles_json -%}
+  [{"id":"stil1","label":{{ section.settings.stil1_label | json }},"thumb":{{ thumb1 | json }}},{"id":"stil2","label":{{ section.settings.stil2_label | json }},"thumb":{{ thumb2 | json }}}]
+{%- endcapture -%}
+
+{{ 'flis-editor.css' | asset_url | stylesheet_tag }}
+
+<div id="lag-bilflis" class="page-width bilflis-editor-section" style="scroll-margin-top: 80px; padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
+  {%- if section.settings.heading != blank -%}
+    <h2 style="text-align:center;">{{ section.settings.heading | escape }}</h2>
+  {%- endif -%}
+  {%- if section.settings.intro != blank -%}
+    <div style="text-align:center; max-width:560px; margin:0 auto 16px;">{{ section.settings.intro }}</div>
+  {%- endif -%}
+  {%- if p == blank -%}
+    <p style="text-align:center;">Velg et produkt i seksjonens innstillinger.</p>
+  {%- else -%}
+    <div style="max-width:560px; margin:0 auto;">
+      <div
+        data-bilflis-editor
+        data-variants="{{ variants_json | strip | escape }}"
+        data-styles="{{ styles_json | strip | escape }}"
+        data-api="{{ section.settings.api_url | escape }}"
+        data-cart-url="{{ routes.cart_url }}"
+      ><p style="text-align:center; padding:40px 0; opacity:.7;">Laster bilflis-verktøyet …</p></div>
+    </div>
+  {%- endif -%}
+</div>
+
+<script src="{{ 'bilflis-editor.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Bilflis-editor (AI)",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "product", "id": "product", "label": "Produkt (bare nødvendig hvis seksjonen ikke ligger på en produktside)" },
+    { "type": "text", "id": "api_url", "label": "Adresse til bildetjenesten (Cloudflare Worker)", "info": "F.eks. https://bilflis.dittnavn.workers.dev" },
+    { "type": "text", "id": "stil1_label", "label": "Stil 1 – navn", "default": "Røyk og brostein" },
+    { "type": "image_picker", "id": "stil1_image", "label": "Stil 1 – bilde (vises som valg)" },
+    { "type": "text", "id": "stil2_label", "label": "Stil 2 – navn", "default": "Stormnatt" },
+    { "type": "image_picker", "id": "stil2_image", "label": "Stil 2 – bilde (vises som valg)" },
+    { "type": "text", "id": "heading", "label": "Overskrift", "default": "Lag din bilflis" },
+    { "type": "richtext", "id": "intro", "label": "Introtekst",
+      "default": "<p>Velg stil og last opp et bilde av bilen din. Vi setter bilen inn i bildet, og du ser resultatet før du bestiller.</p>" },
+    { "type": "range", "id": "padding_top", "label": "Luft over", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 36 },
+    { "type": "range", "id": "padding_bottom", "label": "Luft under", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 60 }
+  ],
+  "presets": [{ "name": "Bilflis-editor (AI)" }]
+}
+{% endschema %}

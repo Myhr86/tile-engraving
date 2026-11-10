@@ -140,3 +140,21 @@ with open("shopify/templates/product.dorskilt.json", "w") as f:
     json.dump(dorskilt_template("Lag ditt dørskilt",
         "<p>Skriv topptekst og navn, og velg motiv i midten. Du ser med en gang hvordan dørskiltet blir.</p>",
         "Lag ditt dørskilt ↓"), f, ensure_ascii=False, indent=2)
+
+def bilflis_template(heading, intro, link, api_url=""):
+    """Produktmal med bilflis-editoren (AI-bilde av kundens bil)."""
+    t = familietre_template(heading, intro, link)
+    t["sections"]["main"]["blocks"]["product-details"]["blocks"]["group_main"]["blocks"]["flis_link"]["settings"]["text"] = \
+        f'<p><a href="#lag-bilflis"><strong>{link}</strong></a></p>'
+    t["sections"].pop("familietre_editor")
+    t["sections"]["bilflis_editor"] = {"type": "bilflis-editor", "settings": {
+        "api_url": api_url, "stil1_label": "Røyk og brostein", "stil2_label": "Stormnatt",
+        "stil1_image": "shopify://shop_images/bilflis-stil1.png", "stil2_image": "shopify://shop_images/bilflis-stil2.png",
+        "heading": heading, "intro": intro, "padding_top": 36, "padding_bottom": 60}}
+    t["order"] = ["main", "bilflis_editor"]
+    return t
+
+with open("shopify/templates/product.bilflis.json", "w") as f:
+    json.dump(bilflis_template("Lag din bilflis",
+        "<p>Velg stil og last opp et bilde av bilen din. Vi setter bilen inn i bildet, og du ser resultatet før du bestiller.</p>",
+        "Lag din bilflis ↓"), f, ensure_ascii=False, indent=2)
