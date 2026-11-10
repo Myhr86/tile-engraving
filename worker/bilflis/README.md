@@ -25,8 +25,7 @@ nettbutikken. OpenAI-nøkkelen ligger bare her, aldri i nettbutikken.
 6. **Settings → Variables and Secrets:**
    * *Secret* `OPENAI_API_KEY` = OpenAI-nøkkelen din.
    * *Text* `ALLOWED_ORIGINS` = `https://myhrtreogdesign.com,https://www.myhrtreogdesign.com,https://uxac0y-us.myshopify.com`
-   * *Text* `STYLE_URL_STIL1` og `STYLE_URL_STIL2` = adressene i `wrangler.toml`.
-   * Valgfritt: `MODEL`, `QUALITY`, `MAX_PER_IP` og `MAX_PER_DAY` (standardverdiene står i `wrangler.toml`).
+   * Valgfritt: `MODEL`, `QUALITY`, `MAX_PER_IP` og `MAX_PER_DAY` (standardverdiene står i `wrangler.toml`). Stilbildenes adresser ligger i koden, så `STYLE_URL_STIL1/2` trengs ikke.
 7. Kopier adressen til workeren, for eksempel `https://bilflis.dittnavn.workers.dev`. Lim den inn i temaet: **Tilpass → produktmalen «bilflis» → Bilflis-editor (AI) → Adresse til bildetjenesten**.
 8. Test: åpne `https://bilflis.dittnavn.workers.dev/status`. Siden skal vise `{"error":"Ikke tillatt."}`, fordi den bare svarer nettbutikken. Det er riktig.
 

@@ -80,7 +80,8 @@ async function sha(text) {
 
 // Stilbildet hentes fra nettbutikkens filer og mellomlagres. STYLE_URL_STIL1/2 kan overstyre adressen.
 async function styleImage(env, key) {
-  const url = env[`STYLE_URL_${key.toUpperCase()}`] || STYLES[key].url;
+  const custom = String(env[`STYLE_URL_${key.toUpperCase()}`] || '').trim();
+  const url = /^https:\/\//.test(custom) ? custom : STYLES[key].url;   // ugyldig verdi -> standard
   const resp = await fetch(url, { cf: { cacheTtl: 86400, cacheEverything: true } });
   if (!resp.ok) throw new Error(`stilbildet kunne ikke hentes (${resp.status})`);
   return new File([await resp.arrayBuffer()], `${key}.png`, { type: resp.headers.get('Content-Type') || 'image/png' });
