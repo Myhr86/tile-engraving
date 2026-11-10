@@ -12,6 +12,7 @@
 export const STYLES = {
   stil1: {
     label: 'Røyk og brostein',
+    url: 'https://cdn.shopify.com/s/files/1/0725/2154/7833/files/bilflis-stil1.png?v=1794327800',
     size: '1024x1024',
     prompt: `Image 1 is the style and scene reference. Image 2 is a photo of the customer's car.
 Recreate image 1 as closely as possible, but replace the car in it with the customer's car from image 2.
@@ -20,6 +21,7 @@ The car must be faithful to image 2: same make, model, body shape, generation, g
   },
   stil2: {
     label: 'Stormnatt',
+    url: 'https://cdn.shopify.com/s/files/1/0725/2154/7833/files/bilflis-stil2.png?v=1794327801',
     size: '1536x1024',
     prompt: `Image 1 is the style and scene reference. Image 2 is a photo of the customer's car.
 Recreate image 1 as closely as possible, but replace the car in it with the customer's car from image 2.
@@ -76,12 +78,11 @@ async function sha(text) {
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('').slice(0, 32);
 }
 
-// Stilbildet hentes fra nettbutikkens filer (URL i STYLE_URL_STIL1/2) og mellomlagres.
+// Stilbildet hentes fra nettbutikkens filer og mellomlagres. STYLE_URL_STIL1/2 kan overstyre adressen.
 async function styleImage(env, key) {
-  const url = env[`STYLE_URL_${key.toUpperCase()}`];
-  if (!url) throw new Error(`Mangler STYLE_URL_${key.toUpperCase()}`);
+  const url = env[`STYLE_URL_${key.toUpperCase()}`] || STYLES[key].url;
   const resp = await fetch(url, { cf: { cacheTtl: 86400, cacheEverything: true } });
-  if (!resp.ok) throw new Error(`Stilbildet kunne ikke hentes (${resp.status})`);
+  if (!resp.ok) throw new Error(`stilbildet kunne ikke hentes (${resp.status})`);
   return new File([await resp.arrayBuffer()], `${key}.png`, { type: resp.headers.get('Content-Type') || 'image/png' });
 }
 
@@ -148,7 +149,8 @@ export default {
       return json({ error: 'Ikke funnet.' }, 404, h);
     } catch (e) {
       console.log('Feil', e && e.stack || e);
-      return json({ error: 'Noe gikk galt på serveren. Prøv igjen.' }, 500, h);
+      const why = String(e && e.message || e).replace(/sk-[\w-]+/g, '…').slice(0, 160);
+      return json({ error: `Noe gikk galt på serveren (${why}). Prøv igjen.` }, 500, h);
     }
   },
 };
