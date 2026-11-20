@@ -120,3 +120,11 @@ node tools/build-shopify.mjs
 * På ordren står *Stil*, **Bilde** (ferdig PNG for LightBurn) og *Bilfoto* (kundens original). Bildet behandles ikke videre, så du bruker dine vanlige innstillinger.
 * Kvoter: 3 forsøk per kunde per døgn og 60 totalt per døgn (kan endres i Cloudflare).
 * Temaet **«Vessel – bilflis (AI)»** (ikke publisert) har seksjonen, editoren og malen. Adressen til bildetjenesten må fylles inn i seksjonen når workeren er satt opp. Se `worker/bilflis/README.md`.
+
+## Dåpstavle med editor
+
+* **«Dåpstavle»** (`/products/dapstavle`, 359 kr) bruker nå malen `dapstavle`, og beskrivelsen har en ny «Slik bestiller du».
+* Kunden skriver navn, fødselsdato, klokkeslett, vekt og lengde, og kan endre teksten i boksen («Lille skatten», «Lille prinsesse» …) og i banneret. Ukedagen regnes ut fra datoen, og urskiven viser klokkeslettet.
+* Tavlen er tegnet som vektorer i `js/dapstavle.js`, etter produktbildet. Størrelsen er anslått til **200 × 230 mm** (`PLATE`) og må bekreftes. Skriftene er Roboto Slab (navn) og Roboto Condensed (resten).
+* På ordren står *Navn*, *Født* (f.eks. «Fredag 26.04.2024 kl. 09:15»), *Vekt*, *Lengde*, *Tekst i boksen*, *Tekst i banneret*, *Forhåndsvisning*, *_Oppskrift* og **_SVG-fil** (hele tavlen i mm, med rød hårstrek for omrisset).
+* Temaet **«Vessel – dåpstavle-editor»** (ikke publisert) har seksjonen, editoren og malen.
