@@ -872,8 +872,19 @@ ${ref}${parts}
 
     let tree = null;   // familietre-oppsett
     let door = null;   // dørskilt-oppsett
+    let board = null;  // dåpstavle-oppsett
     async function show(recipe) {
       r = recipe;
+      board = null;
+      if (r.type === 'dapstavle' && window.BaptismBoard) {
+        board = await BaptismBoard.layout(r); door = null; tree = null; res = null;
+        mock.hidden = false; BaptismBoard.render(mock, board, { ppm: 4 });
+        tech.hidden = true;
+        info.textContent = `Dåpstavle ${BaptismBoard.PLATE.w} × ${BaptismBoard.PLATE.h} mm: ${r.name || ''}. ` +
+          'SVG-filen er hele tavlen i riktig størrelse. Rød hårstrek viser tavlens omriss.';
+        msg.textContent = '';
+        return;
+      }
       if (r.type === 'dorskilt' && window.DoorSign) {
         door = await DoorSign.layout(r); tree = null; res = null;
         mock.hidden = false; DoorSign.render(mock, door, { ppm: 5 });
@@ -910,12 +921,14 @@ ${ref}${parts}
     }
 
     svgBtn.onclick = () => {
-      if (door) download(new Blob([DoorSign.toSVG(door)], { type: 'image/svg+xml' }), fileName({ product: 'dorskilt', lines: r.names }, 'svg'));
+      if (board) download(new Blob([BaptismBoard.toSVG(board)], { type: 'image/svg+xml' }), fileName({ product: 'dapstavle', lines: [r.name] }, 'svg'));
+      else if (door) download(new Blob([DoorSign.toSVG(door)], { type: 'image/svg+xml' }), fileName({ product: 'dorskilt', lines: r.names }, 'svg'));
       else if (tree) download(new Blob([FamilyTree.toSVG(tree)], { type: 'image/svg+xml' }), fileName({ product: 'familietre', lines: [r.bottom.text] }, 'svg'));
       else if (res) download(new Blob([TE.toSVG(res)], { type: 'image/svg+xml' }), fileName(r, 'svg'));
     };
     pngBtn.onclick = async () => {
-      if (door) download(await DoorSign.toPNG(door, 600), fileName({ product: 'dorskilt', lines: r.names }, 'png'));
+      if (board) download(await BaptismBoard.toPNG(board, 600), fileName({ product: 'dapstavle', lines: [r.name] }, 'png'));
+      else if (door) download(await DoorSign.toPNG(door, 600), fileName({ product: 'dorskilt', lines: r.names }, 'png'));
       else if (tree) download(await FamilyTree.toPNG(tree, 600), fileName({ product: 'familietre', lines: [r.bottom.text] }, 'png'));
       else if (res) download(await TE.toPNG(res, 600), fileName(r, 'png'));
     };

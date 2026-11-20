@@ -21,9 +21,12 @@ bundle('flis-editor.js', ['js/presets.js', 'js/processing.js', 'js/crop.js', 'js
 const b64 = (p) => readFileSync(join(root, p)).toString('base64');
 const fontFiles = { script: 'great-vibes-latin-400-normal.woff', dancing: 'dancing-script-latin-700-normal.woff',
   serif: 'playfair-display-latin-700-normal.woff', roman: 'cinzel-latin-700-normal.woff', sans: 'montserrat-latin-600-normal.woff' };
-const fonts = Object.fromEntries(Object.entries(fontFiles).map(([k, f]) => [k, b64('fonts/' + f)]));
-const embed = (name, images) => {
-  const data = { fonts, images: Object.fromEntries(images.map((f) => [f, 'data:image/jpeg;base64,' + b64('shop/img/' + f)])) };
+// Ekstra skrifter som bare dåpstavlen bruker (bakes bare inn der de trengs)
+const extraFonts = { slab: 'roboto-slab-latin-700-normal.woff', cond: 'roboto-condensed-latin-700-normal.woff' };
+const allFonts = { ...fontFiles, ...extraFonts };
+const fonts = (keys) => Object.fromEntries(keys.map((k) => [k, b64('fonts/' + allFonts[k])]));
+const embed = (name, images, fontKeys = Object.keys(fontFiles)) => {
+  const data = { fonts: fonts(fontKeys), images: Object.fromEntries(images.map((f) => [f, 'data:image/jpeg;base64,' + b64('shop/img/' + f)])) };
   writeFileSync(join(root, `js/embedded-${name}.generated.js`),
     '/* GENERERT av tools/build-shopify.mjs: skrifter (OFL, se fonts/LICENSE.md) og produktbilder. */\nwindow.TextEngraveEmbedded = ' + JSON.stringify(data) + ';\n');
   return `js/embedded-${name}.generated.js`;
@@ -32,7 +35,8 @@ const core = ['vendor/opentype.min.js', 'js/processing.js', 'js/textengrave.js']
 bundle('tekst-editor.js', [embed('tekst', ['korketrekker-tom.jpg']), ...core, 'shop/svg-eksport.js', 'shop/tekst-editor.js']);
 bundle('familietre-editor.js', [embed('familietre', ['familietre-mdf.jpg', 'familietre-lakk.jpg']), ...core, 'js/familietre.js', 'shop/svg-eksport.js', 'shop/familietre-editor.js']);
 bundle('dorskilt-editor.js', [embed('dorskilt', []), ...core, 'js/dorskilt-motiv-fjell.js', 'js/dorskilt-motiver.js', 'js/dorskilt.js', 'shop/svg-eksport.js', 'shop/dorskilt-editor.js']);
-bundle('svg-eksport.js', [embed('eksport', ['korketrekker-tom.jpg']), ...core, 'js/familietre.js', 'js/dorskilt-motiv-fjell.js', 'js/dorskilt-motiver.js', 'js/dorskilt.js', 'shop/svg-eksport.js']);
+bundle('dapstavle-editor.js', [embed('dapstavle', [], ['slab', 'cond']), ...core, 'js/dapstavle.js', 'shop/svg-eksport.js', 'shop/dapstavle-editor.js']);
+bundle('svg-eksport.js', [embed('eksport', ['korketrekker-tom.jpg'], Object.keys(allFonts)), ...core, 'js/familietre.js', 'js/dorskilt-motiv-fjell.js', 'js/dorskilt-motiver.js', 'js/dorskilt.js', 'js/dapstavle.js', 'shop/svg-eksport.js']);
 bundle('bilflis-editor.js', ['shop/bilflis-editor.js']);
 writeFileSync(join(root, 'shopify/assets/flis-editor.css'), header + readFileSync(join(root, 'shop/editor.css'), 'utf8'));
 for (const f of readdirSync(join(root, 'fonts')).filter((f) => f.endsWith('.woff'))) copyFileSync(join(root, 'fonts', f), join(root, 'shopify/assets', f));

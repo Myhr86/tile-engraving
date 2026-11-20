@@ -63,3 +63,7 @@
 .bilflis-editor .bf-upload { padding: 10px 14px; }
 .bilflis-editor .bf-generate { margin-top: 4px; }
 .bilflis-editor .fe-add + .fe-add { margin-top: 12px; }
+/* Dåpstavle-editor */
+.dapstavle-editor .dt-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.dapstavle-editor .dt-pair .fe-field { margin: 4px 0; }
+.dapstavle-editor .dt-chips .fe-chip { flex: 1 1 40%; min-width: 0; font-size: 14px; padding: 7px 6px; }

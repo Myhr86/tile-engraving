@@ -158,3 +158,18 @@ with open("shopify/templates/product.bilflis.json", "w") as f:
     json.dump(bilflis_template("Lag din bilflis",
         "<p>Velg stil og last opp et bilde av bilen din. Vi setter bilen inn i bildet, og du ser resultatet før du bestiller.</p>",
         "Lag din bilflis ↓", "https://bilflis.zarfox86.workers.dev"), f, ensure_ascii=False, indent=2)
+
+def dapstavle_template(heading, intro, link):
+    """Produktmal med dåpstavle-editoren."""
+    t = familietre_template(heading, intro, link)
+    t["sections"]["main"]["blocks"]["product-details"]["blocks"]["group_main"]["blocks"]["flis_link"]["settings"]["text"] = \
+        f'<p><a href="#lag-dapstavle"><strong>{link}</strong></a></p>'
+    t["sections"]["dapstavle_editor"] = t["sections"].pop("familietre_editor")
+    t["sections"]["dapstavle_editor"]["type"] = "dapstavle-editor"
+    t["order"] = ["main", "dapstavle_editor"]
+    return t
+
+with open("shopify/templates/product.dapstavle.json", "w") as f:
+    json.dump(dapstavle_template("Lag din dåpstavle",
+        "<p>Skriv navn, fødselsdato, klokkeslett, vekt og lengde. Du ser med en gang hvordan dåpstavlen blir.</p>",
+        "Lag din dåpstavle ↓"), f, ensure_ascii=False, indent=2)

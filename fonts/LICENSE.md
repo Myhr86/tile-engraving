@@ -1,6 +1,6 @@
 # Skrifter
 
-Alle skriftene er lisensiert under SIL Open Font License 1.1 (OFL). De kan brukes, bygges inn og distribueres fritt, også kommersielt. Filene er hentet fra Fontsource-pakkene på npm (latin-utvalg, som inkluderer æ, ø og å).
+Skriftene er lisensiert under SIL Open Font License 1.1 (OFL), unntatt Roboto Slab, som er lisensiert under Apache License 2.0. De kan brukes, bygges inn og distribueres fritt, også kommersielt. Filene er hentet fra Fontsource-pakkene på npm (latin-utvalg, som inkluderer æ, ø og å).
 
 | Fil | Skrift |
 |---|---|
@@ -9,6 +9,8 @@ Alle skriftene er lisensiert under SIL Open Font License 1.1 (OFL). De kan bruke
 | playfair-display-latin-700-normal.woff | Playfair Display Bold |
 | cinzel-latin-700-normal.woff | Cinzel Bold |
 | montserrat-latin-600-normal.woff | Montserrat SemiBold |
+| roboto-slab-latin-700-normal.woff | Roboto Slab Bold (Apache License 2.0, https://www.apache.org/licenses/LICENSE-2.0) |
+| roboto-condensed-latin-700-normal.woff | Roboto Condensed Bold (OFL 1.1) |
 
 ## great-vibes
 
