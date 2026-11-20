@@ -92,7 +92,7 @@
         console.error(e); this.msg.textContent = `Klarte ikke å laste skriftene (${e.message}). Last siden på nytt.`; return;
       }
       this.badge.hidden = !example;
-      BB.render(this.canvas, this.lay, { ppm: 4 });
+      BB.render(this.canvas, this.lay, { ppm: 6 });
       this.info.textContent = this.missing().length && !example ? `Mangler: ${this.missing().join(', ')}.` : '';
       this.updateButton();
     }
@@ -138,7 +138,7 @@
         if (r.box) fd.append('properties[Tekst i boksen]', r.box);
         if (r.banner) fd.append('properties[Tekst i banneret]', r.banner);
         const c = document.createElement('canvas');
-        BB.render(c, lay, { ppm: 4 });
+        BB.render(c, lay, { ppm: 6 });
         fd.append('properties[Forhåndsvisning]', new File([await toBlob(c, 'image/jpeg', 0.9)], 'forhandsvisning.jpg', { type: 'image/jpeg' }));
         fd.append('properties[_Oppskrift]', JSON.stringify(r));
         if (this.exportUrl && window.TekstOppskrift) fd.append('properties[_SVG-fil]', this.exportUrl + '#' + window.TekstOppskrift.encode(r));

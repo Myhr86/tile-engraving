@@ -125,6 +125,6 @@ node tools/build-shopify.mjs
 
 * **«Dåpstavle»** (`/products/dapstavle`, 359 kr) bruker nå malen `dapstavle`, og beskrivelsen har en ny «Slik bestiller du».
 * Kunden skriver navn, fødselsdato, klokkeslett, vekt og lengde, og kan endre teksten i boksen («Lille skatten», «Lille prinsesse» …) og i banneret. Ukedagen regnes ut fra datoen, og urskiven viser klokkeslettet.
-* Tavlen er tegnet som vektorer i `js/dapstavle.js`, etter produktbildet. Størrelsen er anslått til **200 × 230 mm** (`PLATE`) og må bekreftes. Skriftene er Roboto Slab (navn) og Roboto Condensed (resten).
+* Tavlen er tegnet som vektorer i `js/dapstavle.js`, etter produktbildet. Tavlen er **130 × 170 mm** (`PLATE`). Oppsettet er tegnet i et designrom på 200 × 230 og skaleres likt i begge retninger, mens radene flyttes for å fylle høyden. Skriftene er Roboto Slab (navn) og Roboto Condensed (resten).
 * På ordren står *Navn*, *Født* (f.eks. «Fredag 26.04.2024 kl. 09:15»), *Vekt*, *Lengde*, *Tekst i boksen*, *Tekst i banneret*, *Forhåndsvisning*, *_Oppskrift* og **_SVG-fil** (hele tavlen i mm, med rød hårstrek for omrisset).
 * Temaet **«Vessel – dåpstavle-editor»** (ikke publisert) har seksjonen, editoren og malen.

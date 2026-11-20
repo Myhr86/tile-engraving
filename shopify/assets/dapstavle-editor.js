@@ -551,8 +551,17 @@ ${frame ? `  <rect x="0" y="0" width="${w}" height="${h}" fill="none" stroke="#f
   TE.FONTS.slab = TE.FONTS.slab || { label: 'Slab', file: 'roboto-slab-latin-700-normal.woff', hidden: true };
   TE.FONTS.cond = TE.FONTS.cond || { label: 'Smal', file: 'roboto-condensed-latin-700-normal.woff', hidden: true };
 
-  // Mål i mm. Oppsettet er målt fra produktbildet (tavlen er ca. 200 × 230 mm).
-  const PLATE = { label: 'Dåpstavle', w: 200, h: 230, r: 4 };
+  // Tavlen er 130 × 170 mm. Oppsettet er tegnet i et designrom på 200 × 230 (målt fra
+  // produktbildet) og skaleres likt i begge retninger (S). Den ekstra høyden fordeles ved
+  // at hver rad flyttes etter sitt ankerpunkt (K), så skriften aldri strekkes.
+  const PLATE = { label: 'Dåpstavle', w: 130, h: 170, r: 3 };
+  const DESIGN = { w: 200, h: 230 };
+  const S = PLATE.w / DESIGN.w, K = PLATE.h / DESIGN.h;
+  const ROW = { banner: 25, 'banner-haler': 25, navn: 61, kvister: 61,
+    datoboks: 124, født: 124, ukedag: 124, dag: 124, måned: 124, år: 124, klokkeslett: 124, klokke: 124, tekstboks: 124,
+    'vekt-tittel': 182, vekt: 182, 'vekt-ikon': 182, 'lengde-tittel': 182, lengde: 182, målebånd: 182 };
+  // Hvert element: designkoordinater -> tavlens mm: x' = S·x, y' = S·y + (K − S)·anker
+  const placeOf = (s) => ({ ty: (K - S) * (ROW[s.label] != null ? ROW[s.label] : DESIGN.h / 2), s: S });
   const WEEKDAYS = ['SØNDAG', 'MANDAG', 'TIRSDAG', 'ONSDAG', 'TORSDAG', 'FREDAG', 'LØRDAG'];
   const EXAMPLE = { banner: 'Velkommen til verden', name: 'Peder', date: '2024-04-26', time: '09:15', weight: '3450', length: '49', box: 'Lille skatten' };
 
@@ -816,7 +825,7 @@ ${frame ? `  <rect x="0" y="0" width="${w}" height="${h}" fill="none" stroke="#f
     grain(ctx, PLATE.w, PLATE.h, ppm, 7, 0.35);
     // gravering: lyst, ubehandlet tre
     ctx.fillStyle = '#e9cc9c';
-    for (const s of lay.items) { ctx.save(); ctx.translate(s.x, s.y); ctx.fill(new Path2D(s.d), s.rule || 'nonzero'); ctx.restore(); }
+    for (const s of lay.items) { const P = placeOf(s); ctx.save(); ctx.translate(0, P.ty); ctx.scale(P.s, P.s); ctx.translate(s.x, s.y); ctx.fill(new Path2D(s.d), s.rule || 'nonzero'); ctx.restore(); }
     // svake årer også over graveringen
     ctx.globalCompositeOperation = 'multiply'; grain(ctx, PLATE.w, PLATE.h, ppm, 11, 0.12);
     ctx.restore();
@@ -826,7 +835,7 @@ ${frame ? `  <rect x="0" y="0" width="${w}" height="${h}" fill="none" stroke="#f
   // ---------- SVG til LightBurn ----------
   function toSVG(lay, { outline = true } = {}) {
     const { w, h, r } = PLATE;
-    const parts = lay.items.map((s) => `  <path id="${s.label}" transform="translate(${f(s.x)} ${f(s.y)})" d="${s.d}" fill="#000000"${s.rule === 'evenodd' ? ' fill-rule="evenodd"' : ''}/>`).join('\n');
+    const parts = lay.items.map((s) => { const P = placeOf(s); return `  <path id="${s.label}" transform="matrix(${f(P.s)} 0 0 ${f(P.s)} ${f(P.s * s.x)} ${f(P.ty + P.s * s.y)})" d="${s.d}" fill="#000000"${s.rule === 'evenodd' ? ' fill-rule="evenodd"' : ''}/>`; }).join('\n');
     const ref = outline ? `  <rect id="plate" x="0" y="0" width="${w}" height="${h}" rx="${r}" ry="${r}" fill="none" stroke="#ff0000" stroke-width="0.1"/>\n` : '';
     return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${w}mm" height="${h}mm" viewBox="0 0 ${w} ${h}">
@@ -839,12 +848,12 @@ ${ref}${parts}
     const ppm = dpi / 25.4, c = document.createElement('canvas');
     c.width = Math.round(PLATE.w * ppm); c.height = Math.round(PLATE.h * ppm);
     const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height); ctx.scale(ppm, ppm); ctx.fillStyle = '#000';
-    for (const s of lay.items) { ctx.save(); ctx.translate(s.x, s.y); ctx.fill(new Path2D(s.d), s.rule || 'nonzero'); ctx.restore(); }
+    for (const s of lay.items) { const P = placeOf(s); ctx.save(); ctx.translate(0, P.ty); ctx.scale(P.s, P.s); ctx.translate(s.x, s.y); ctx.fill(new Path2D(s.d), s.rule || 'nonzero'); ctx.restore(); }
     const blob = await new Promise((res) => c.toBlob(res, 'image/png'));
     return window.Engrave && Engrave.pngWithDpi ? Engrave.pngWithDpi(blob, dpi) : blob;
   }
 
-  window.BaptismBoard = { PLATE, EXAMPLE, WEEKDAYS, dateParts, splitBox, layout, render, toSVG, toPNG };
+  window.BaptismBoard = { PLATE, DESIGN, EXAMPLE, WEEKDAYS, dateParts, splitBox, layout, render, toSVG, toPNG };
 })();
 
 /* ---- shop/svg-eksport.js ---- */
@@ -909,7 +918,7 @@ ${ref}${parts}
       board = null;
       if (r.type === 'dapstavle' && window.BaptismBoard) {
         board = await BaptismBoard.layout(r); door = null; tree = null; res = null;
-        mock.hidden = false; BaptismBoard.render(mock, board, { ppm: 4 });
+        mock.hidden = false; BaptismBoard.render(mock, board, { ppm: 6 });
         tech.hidden = true;
         info.textContent = `Dåpstavle ${BaptismBoard.PLATE.w} × ${BaptismBoard.PLATE.h} mm: ${r.name || ''}. ` +
           'SVG-filen er hele tavlen i riktig størrelse. Rød hårstrek viser tavlens omriss.';
@@ -1076,7 +1085,7 @@ ${ref}${parts}
         console.error(e); this.msg.textContent = `Klarte ikke å laste skriftene (${e.message}). Last siden på nytt.`; return;
       }
       this.badge.hidden = !example;
-      BB.render(this.canvas, this.lay, { ppm: 4 });
+      BB.render(this.canvas, this.lay, { ppm: 6 });
       this.info.textContent = this.missing().length && !example ? `Mangler: ${this.missing().join(', ')}.` : '';
       this.updateButton();
     }
@@ -1122,7 +1131,7 @@ ${ref}${parts}
         if (r.box) fd.append('properties[Tekst i boksen]', r.box);
         if (r.banner) fd.append('properties[Tekst i banneret]', r.banner);
         const c = document.createElement('canvas');
-        BB.render(c, lay, { ppm: 4 });
+        BB.render(c, lay, { ppm: 6 });
         fd.append('properties[Forhåndsvisning]', new File([await toBlob(c, 'image/jpeg', 0.9)], 'forhandsvisning.jpg', { type: 'image/jpeg' }));
         fd.append('properties[_Oppskrift]', JSON.stringify(r));
         if (this.exportUrl && window.TekstOppskrift) fd.append('properties[_SVG-fil]', this.exportUrl + '#' + window.TekstOppskrift.encode(r));

@@ -791,7 +791,7 @@ ${groups}
       board = null;
       if (r.type === 'dapstavle' && window.BaptismBoard) {
         board = await BaptismBoard.layout(r); door = null; tree = null; res = null;
-        mock.hidden = false; BaptismBoard.render(mock, board, { ppm: 4 });
+        mock.hidden = false; BaptismBoard.render(mock, board, { ppm: 6 });
         tech.hidden = true;
         info.textContent = `Dåpstavle ${BaptismBoard.PLATE.w} × ${BaptismBoard.PLATE.h} mm: ${r.name || ''}. ` +
           'SVG-filen er hele tavlen i riktig størrelse. Rød hårstrek viser tavlens omriss.';
